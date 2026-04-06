@@ -1,0 +1,2880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Learn</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --bg2: #13161e;
+  --bg3: #1a1e2a;
+  --border: #252a38;
+  --accent: #4fffb0;
+  --accent2: #ff6b6b;
+  --accent3: #ffd166;
+  --text: #e8eaf2;
+  --muted: #7a84a0;
+  --card: #141820;
+  --kw: #c792ea;
+  --fn: #82aaff;
+  --str: #c3e88d;
+  --num: #f78c6c;
+  --op: #89ddff;
+  --qbg: #0a0c10;
+}
+
+body.light-mode {
+  --bg: #f4f6fb;
+  --bg2: #ffffff;
+  --bg3: #eef0f7;
+  --border: #d0d5e8;
+  --text: #1a1d2e;
+  --muted: #6b7494;
+  --card: #ffffff;
+  --kw: #7c3aed;
+  --fn: #1d4ed8;
+  --str: #16a34a;
+  --num: #c2410c;
+  --op: #0891b2;
+  --qbg: #f0f2fa;
+}
+
+body.light-mode nav{background:rgba(255,255,255,0.95);}
+body.light-mode .query-block{background:var(--qbg);}
+body.light-mode .glow-kw{text-shadow:0 0 6px rgba(124,58,237,0.6),0 0 14px rgba(124,58,237,0.3);}
+body.light-mode .glow-fn{text-shadow:0 0 6px rgba(29,78,216,0.6),0 0 14px rgba(29,78,216,0.3);}
+body.light-mode .regex-wrap{background:var(--qbg);}
+body.light-mode .kpill{background:var(--bg3);}
+body.light-mode .col-chip{background:var(--bg3);}
+body.light-mode .pcard{background:var(--card);}
+body.light-mode .tbl-card{background:var(--card);}
+body.light-mode .qcard{background:var(--card);}
+body.light-mode thead tr{background:var(--qbg);}
+
+*{transition:background-color 0.2s,color 0.15s,border-color 0.15s;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;}
+
+/* ── NAV ── */
+nav{
+  background:rgba(13,15,20,0.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;
+  display:flex;align-items:center;gap:0;
+  position:sticky;top:0;z-index:200;height:58px;
+}
+.nav-brand{
+  font-family:'JetBrains Mono',monospace;
+  font-size:1rem;font-weight:700;color:var(--accent);
+  letter-spacing:-0.5px;margin-right:2.5rem;white-space:nowrap;
+}
+.nav-brand span{color:var(--muted);}
+.nav-links{display:flex;gap:0;}
+.nav-links button{
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-family:'Syne',sans-serif;
+  font-size:0.82rem;font-weight:700;
+  padding:0 1.1rem;height:58px;
+  border-bottom:2px solid transparent;
+  transition:all 0.2s;text-transform:uppercase;letter-spacing:0.8px;
+}
+.nav-links button:hover{color:var(--text);}
+.nav-links button.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── PAGES ── */
+.page{display:none;animation:fadeIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── HERO ── */
+.hero{padding:3rem 2rem 2rem;max-width:1140px;margin:0 auto;}
+.level-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  border:1px solid;padding:4px 14px;border-radius:20px;
+  font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:1.2rem;
+}
+.badge-beginner{background:rgba(79,255,176,0.08);border-color:rgba(79,255,176,0.3);color:var(--accent);}
+.badge-intermediate{background:rgba(255,209,102,0.08);border-color:rgba(255,209,102,0.3);color:var(--accent3);}
+.badge-advanced{background:rgba(255,107,107,0.08);border-color:rgba(255,107,107,0.3);color:var(--accent2);}
+
+.hero h1{font-size:2.6rem;font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:0.8rem;}
+.hero p{color:var(--muted);font-size:0.98rem;max-width:580px;line-height:1.65;}
+
+/* ── CONTENT ── */
+.content{max-width:1140px;margin:0 auto;padding:0.5rem 2rem 5rem;display:flex;flex-direction:column;gap:1.8rem;}
+
+/* ── SECTION LABEL ── */
+.section-label{
+  display:flex;align-items:center;gap:12px;
+  font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);
+  margin-bottom:-0.5rem;margin-top:1rem;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── QUERY CARD ── */
+.qcard{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  transition:border-color 0.25s,box-shadow 0.25s;
+}
+.qcard:hover{border-color:rgba(79,255,176,0.2);box-shadow:0 0 0 1px rgba(79,255,176,0.05),0 8px 32px rgba(0,0,0,0.3);}
+
+.qcard-header{
+  padding:1.1rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  background:rgba(255,255,255,0.015);
+  cursor:pointer;user-select:none;
+}
+.qcard-header:hover{background:rgba(255,255,255,0.03);}
+.qcard.expanded .qcard-header{border-bottom:1px solid var(--border);}
+.qcard-chevron{color:var(--muted);font-size:0.8rem;flex-shrink:0;transition:transform 0.25s;}
+.qcard.expanded .qcard-chevron{transform:rotate(180deg);color:var(--accent);}
+.qcard-title{font-size:0.95rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;flex:1;}
+
+.qtag{
+  font-family:'JetBrains Mono',monospace;font-size:0.68rem;
+  padding:3px 8px;border-radius:5px;font-weight:600;
+}
+.qtag-select{background:rgba(130,170,255,0.15);color:var(--fn);}
+.qtag-filter{background:rgba(199,146,234,0.15);color:var(--kw);}
+.qtag-sort{background:rgba(255,209,102,0.15);color:var(--accent3);}
+.qtag-set{background:rgba(79,255,176,0.15);color:var(--accent);}
+.qtag-group{background:rgba(247,140,108,0.15);color:var(--num);}
+.qtag-join{background:rgba(137,221,255,0.15);color:var(--op);}
+.qtag-string{background:rgba(195,232,141,0.15);color:var(--str);}
+.qtag-date{background:rgba(255,107,107,0.15);color:var(--accent2);}
+.qtag-window{background:rgba(199,146,234,0.15);color:var(--kw);}
+.qtag-frame{background:rgba(79,255,176,0.15);color:var(--accent);}
+
+.run-btn{
+  background:var(--accent);color:#0d0f14;
+  border:none;border-radius:7px;
+  font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;
+  padding:7px 16px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  transition:all 0.15s;white-space:nowrap;flex-shrink:0;
+}
+.run-btn:hover{background:#fff;transform:translateY(-1px);}
+.run-btn:active{transform:translateY(0);}
+.run-btn svg{width:13px;height:13px;}
+
+/* ── QUERY BODY — collapsed by default ── */
+.qcard-body{
+  padding:0 1.5rem;
+  display:flex;flex-direction:column;gap:1rem;
+  max-height:0;overflow:hidden;
+  transition:max-height 0.4s ease, padding 0.25s ease;
+}
+.qcard.expanded .qcard-body{
+  max-height:5000px;
+  padding:1.2rem 1.5rem;
+}
+
+/* ── EXPAND ALL BAR ── */
+.expand-bar{
+  max-width:1140px;margin:0 auto;
+  padding:0 2rem 1rem;
+  display:flex;gap:10px;align-items:center;
+}
+.expand-all-btn{
+  background:none;border:1px solid var(--border);
+  border-radius:7px;padding:6px 14px;cursor:pointer;
+  color:var(--muted);font-family:'Syne',sans-serif;
+  font-size:0.75rem;font-weight:700;letter-spacing:0.5px;
+  transition:all 0.2s;display:flex;align-items:center;gap:6px;
+}
+.expand-all-btn:hover{border-color:var(--accent);color:var(--accent);}
+.expand-bar-count{font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+
+.query-block{
+  background:#0a0c10;border:1px solid var(--border);
+  border-radius:8px;padding:1rem 1.2rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.83rem;
+  line-height:1.7;white-space:pre-wrap;word-break:break-all;
+  position:relative;user-select:all;
+}
+.query-block::before{
+  content:'SQL';position:absolute;top:8px;right:10px;
+  font-size:0.62rem;color:var(--border);font-weight:700;letter-spacing:1px;
+}
+
+/* syntax tokens */
+.kw{color:var(--kw);font-weight:600;}
+.fn{color:var(--fn);}
+.str{color:var(--str);}
+.num{color:var(--num);}
+.op{color:var(--op);}
+.cm{color:#546e7a;font-style:italic;}
+
+/* ── GLOW — featured keyword ── */
+.glow-kw{
+  text-shadow:0 0 6px var(--kw), 0 0 14px rgba(199,146,234,0.5);
+}
+.glow-fn{
+  text-shadow:0 0 6px var(--fn), 0 0 14px rgba(130,170,255,0.5);
+}
+
+/* ── EXPLANATION ── */
+.explanation{
+  background:rgba(79,255,176,0.04);
+  border-left:3px solid rgba(79,255,176,0.4);
+  border-radius:0 8px 8px 0;
+  padding:0.9rem 1.1rem;
+  display:flex;flex-direction:column;gap:6px;
+}
+.exp-ar{font-size:0.9rem;color:var(--text);line-height:1.6;direction:rtl;text-align:right;}
+.exp-en{font-size:0.8rem;color:var(--muted);line-height:1.5;font-style:italic;}
+
+/* ── OUTPUT TABLE ── */
+.output-area{display:none;}
+.output-area.visible{display:block;animation:fadeIn 0.2s ease;}
+.output-label{
+  font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);margin-bottom:0.6rem;display:flex;align-items:center;gap:8px;
+}
+.output-label span{
+  background:rgba(79,255,176,0.15);color:var(--accent);
+  padding:2px 8px;border-radius:4px;font-size:0.68rem;
+}
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+thead tr{background:#0a0c10;}
+th{
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+  color:var(--muted);padding:9px 14px;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+td{
+  padding:8px 14px;border-bottom:1px solid rgba(37,42,56,0.6);
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.8rem;
+  white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,0.025);}
+.no-rows{padding:1.5rem;text-align:center;color:var(--muted);font-size:0.85rem;font-family:'JetBrains Mono',monospace;}
+
+/* ── REGEX REFERENCE TABLE ── */
+.regex-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:0.5rem;}
+.regex-table th{
+  font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);
+  padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);
+  background:#0a0c10;
+}
+.regex-table td{
+  padding:7px 12px;border-bottom:1px solid rgba(37,42,56,0.5);vertical-align:middle;
+}
+.regex-table tr:last-child td{border-bottom:none;}
+.regex-table tr:hover td{background:rgba(255,255,255,0.02);}
+.regex-pat{
+  font-family:'JetBrains Mono',monospace;font-size:0.82rem;font-weight:700;
+  color:var(--accent);background:rgba(79,255,176,0.08);
+  padding:2px 8px;border-radius:4px;white-space:nowrap;
+}
+.regex-pat.op{color:var(--op);background:rgba(137,221,255,0.08);}
+.regex-meaning{color:var(--text);font-size:0.82rem;}
+.regex-example{
+  font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);
+  white-space:nowrap;
+}
+.regex-example .match{color:var(--accent);font-weight:700;}
+.regex-example .nomatch{color:var(--accent2);}
+.regex-wrap{background:#0a0c10;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1rem;}
+
+/* ── NOTE BOX (for window frames) ── */
+.note-box{
+  background:rgba(255,209,102,0.05);
+  border:1px solid rgba(255,209,102,0.2);
+  border-radius:8px;padding:1rem 1.2rem;
+}
+.note-box .note-title{
+  font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+  color:var(--accent3);margin-bottom:0.6rem;
+}
+.note-box .note-ar{font-size:0.88rem;color:var(--text);line-height:1.65;direction:rtl;text-align:right;margin-bottom:4px;}
+.note-box .note-en{font-size:0.78rem;color:var(--muted);font-style:italic;line-height:1.5;}
+
+/* ── KEYWORD PILLS ── */
+.kpills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.kpill{
+  display:inline-flex;align-items:center;gap:7px;
+  background:#0a0c10;border:1px solid var(--border);
+  border-radius:7px;padding:5px 11px;
+  font-family:'JetBrains Mono',monospace;font-size:0.78rem;
+  transition:border-color 0.2s;
+}
+.kpill:hover{border-color:rgba(79,255,176,0.3);}
+.kpill-key{
+  font-weight:700;font-size:0.82rem;
+  padding:2px 7px;border-radius:4px;
+}
+.kpill-key.green {background:rgba(79,255,176,0.15); color:var(--accent);}
+.kpill-key.yellow{background:rgba(255,209,102,0.15); color:var(--accent3);}
+.kpill-key.purple{background:rgba(199,146,234,0.15); color:var(--kw);}
+.kpill-key.blue  {background:rgba(130,170,255,0.15); color:var(--fn);}
+.kpill-key.red   {background:rgba(255,107,107,0.15); color:var(--accent2);}
+.kpill-key.orange{background:rgba(247,140,108,0.15); color:var(--num);}
+.kpill-sep{color:var(--border);font-size:0.85rem;}
+.kpill-desc{color:var(--muted);font-size:0.77rem;}
+
+/* ── TABLES PAGE ── */
+.tables-grid{max-width:1140px;margin:0 auto;padding:0.5rem 2rem 5rem;display:flex;flex-direction:column;gap:2.5rem;}
+.tbl-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.tbl-card-header{
+  padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.015);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+}
+.tbl-card-title{display:flex;flex-direction:column;gap:6px;}
+.tbl-name{
+  font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;
+  color:var(--accent);display:flex;align-items:center;gap:10px;
+}
+.tbl-name-badge{
+  font-size:0.68rem;padding:3px 8px;border-radius:4px;font-weight:600;
+  background:rgba(79,255,176,0.12);border:1px solid rgba(79,255,176,0.25);color:var(--accent);
+  font-family:'Syne',sans-serif;text-transform:uppercase;letter-spacing:0.5px;
+}
+.tbl-desc{font-size:0.85rem;color:var(--muted);line-height:1.5;}
+.tbl-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.tbl-stat{
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;
+  padding:4px 10px;border-radius:5px;border:1px solid var(--border);
+  color:var(--muted);background:#0a0c10;white-space:nowrap;
+}
+.tbl-stat span{color:var(--accent3);}
+.tbl-body{padding:1.5rem;}
+.col-schema{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.2rem;
+  padding-bottom:1.2rem;border-bottom:1px solid var(--border);
+}
+.col-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#0a0c10;border:1px solid var(--border);
+  border-radius:7px;padding:5px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:0.75rem;
+}
+.col-chip-name{color:var(--text);font-weight:600;}
+.col-chip-type{color:var(--muted);font-size:0.7rem;}
+.col-chip.pk .col-chip-name::before{content:'🔑 ';}
+.col-chip.pk{border-color:rgba(255,209,102,0.3);}
+.col-chip.fk{border-color:rgba(130,170,255,0.25);}
+.col-chip.fk .col-chip-name::before{content:'🔗 ';}
+
+/* query explorer on tables page */
+.tbl-queries{display:flex;flex-direction:column;gap:1rem;}
+.tbl-query-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tbl-query-label{
+  font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+  color:var(--muted);white-space:nowrap;min-width:90px;
+}
+.tbl-query-code{
+  flex:1;background:#0a0c10;border:1px solid var(--border);border-radius:7px;
+  padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;
+  color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tbl-run-btn{
+  background:transparent;border:1px solid var(--accent);color:var(--accent);
+  border-radius:7px;font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;
+  padding:6px 14px;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;
+}
+.tbl-run-btn:hover{background:var(--accent);color:#0d0f14;}
+.tbl-output{display:none;margin-top:0.8rem;}
+.tbl-output.visible{display:block;animation:fadeIn 0.2s ease;}
+
+/* ── PRACTICE PAGE ── */
+.practice-tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  max-width:1140px;margin:0 auto;padding:0 2rem;
+}
+.practice-tab{
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-family:'Syne',sans-serif;
+  font-size:0.82rem;font-weight:700;padding:0 1.4rem;height:48px;
+  border-bottom:2px solid transparent;transition:all 0.2s;
+  text-transform:uppercase;letter-spacing:0.8px;
+}
+.practice-tab:hover{color:var(--text);}
+.practice-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.practice-level{display:none;}
+.practice-level.active{display:flex;flex-direction:column;gap:1.4rem;}
+.practice-content{max-width:1140px;margin:0 auto;padding:1.8rem 2rem 5rem;}
+
+.pcard{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  transition:border-color 0.25s;
+}
+.pcard:hover{border-color:rgba(79,255,176,0.15);}
+.pcard-q{
+  padding:1.1rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  cursor:pointer;user-select:none;
+}
+.pcard-q:hover .reveal-arrow{color:var(--accent);}
+.pcard-num{
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:700;
+  background:rgba(79,255,176,0.1);border:1px solid rgba(79,255,176,0.2);
+  color:var(--accent);padding:3px 9px;border-radius:5px;flex-shrink:0;
+}
+.pcard-num.yellow{background:rgba(255,209,102,0.1);border-color:rgba(255,209,102,0.2);color:var(--accent3);}
+.pcard-num.red{background:rgba(255,107,107,0.1);border-color:rgba(255,107,107,0.2);color:var(--accent2);}
+.pcard-qtext{font-size:0.95rem;font-weight:600;color:var(--text);flex:1;}
+.reveal-arrow{
+  font-size:0.85rem;color:var(--muted);transition:all 0.25s;flex-shrink:0;
+}
+.reveal-arrow.open{transform:rotate(90deg);color:var(--accent);}
+.pcard-answer{
+  display:none;padding:0 1.5rem 1.4rem;
+  border-top:1px solid var(--border);
+  flex-direction:column;gap:1rem;
+}
+.pcard-answer.visible{display:flex;animation:fadeIn 0.2s ease;}
+.answer-label{
+  font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);padding-top:1rem;display:flex;align-items:center;gap:8px;
+}
+.answer-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{
+  margin-left:auto;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:6px 12px;cursor:pointer;
+  color:var(--muted);font-size:0.8rem;font-weight:700;
+  font-family:'Syne',sans-serif;
+  display:flex;align-items:center;gap:6px;
+  transition:all 0.2s;white-space:nowrap;
+}
+.theme-toggle:hover{color:var(--text);border-color:var(--accent);}
+
+/* ── COPY BUTTON ── */
+.query-block{position:relative;}
+.copy-btn{
+  position:absolute;top:8px;right:36px;
+  background:rgba(255,255,255,0.06);border:1px solid var(--border);
+  border-radius:5px;padding:3px 9px;cursor:pointer;
+  color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem;
+  font-weight:700;letter-spacing:0.5px;
+  transition:all 0.15s;opacity:0;
+  pointer-events:none;
+}
+.query-block:hover .copy-btn{opacity:1;pointer-events:all;}
+.copy-btn:hover{background:rgba(79,255,176,0.12);border-color:var(--accent);color:var(--accent);}
+.copy-btn.copied{background:rgba(79,255,176,0.15);border-color:var(--accent);color:var(--accent);}
+
+/* ── DML PAGE ── */
+.dml-content{max-width:1140px;margin:0 auto;padding:0.5rem 2rem 5rem;display:flex;flex-direction:column;gap:2.5rem;}
+.dml-section{display:flex;flex-direction:column;gap:1.2rem;}
+.dml-section-title{
+  display:flex;align-items:center;gap:12px;
+  font-size:1.1rem;font-weight:800;color:var(--text);letter-spacing:-0.5px;
+}
+.dml-badge{
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:700;
+  padding:4px 10px;border-radius:5px;text-transform:uppercase;letter-spacing:0.5px;
+}
+.dml-badge.delete{background:rgba(255,107,107,0.15);color:var(--accent2);}
+.dml-badge.truncate{background:rgba(255,209,102,0.15);color:var(--accent3);}
+.dml-badge.update{background:rgba(130,170,255,0.15);color:var(--fn);}
+.dml-badge.alter{background:rgba(79,255,176,0.15);color:var(--accent);}
+
+.dml-func-title{
+  font-size:0.85rem;font-weight:700;color:var(--text);
+  margin-bottom:4px;
+}
+.dml-func-ar{
+  font-size:0.88rem;color:var(--text);line-height:1.65;
+  direction:rtl;text-align:right;margin-bottom:3px;
+}
+.dml-func-en{font-size:0.78rem;color:var(--muted);font-style:italic;line-height:1.5;}
+
+.dml-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.dml-card-header{
+  padding:1rem 1.4rem;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.015);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  cursor:pointer;user-select:none;
+}
+.dml-card-header:hover{background:rgba(255,255,255,0.03);}
+.dml-card.expanded .dml-card-header{border-bottom:1px solid var(--border);}
+.dml-card-chevron{color:var(--muted);font-size:0.8rem;flex-shrink:0;transition:transform 0.25s;}
+.dml-card.expanded .dml-card-chevron{transform:rotate(180deg);color:var(--accent);}
+.dml-card-title{font-size:0.9rem;font-weight:700;color:var(--text);flex:1;}
+
+.dml-card-body{
+  padding:0 1.4rem;
+  max-height:0;overflow:hidden;
+  transition:max-height 0.4s ease, padding 0.25s ease;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.dml-card.expanded .dml-card-body{max-height:3000px;padding:1.2rem 1.4rem;}
+
+.syntax-block{
+  background:#0a0c10;border:1px solid rgba(79,255,176,0.2);
+  border-radius:8px;padding:0.9rem 1.1rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.82rem;
+  line-height:1.7;white-space:pre-wrap;color:var(--accent);
+  position:relative;
+}
+.syntax-block::before{
+  content:'SYNTAX';position:absolute;top:7px;right:10px;
+  font-size:0.58rem;color:rgba(79,255,176,0.4);font-weight:700;letter-spacing:1px;
+}
+.dml-note{
+  background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.2);
+  border-radius:7px;padding:0.7rem 1rem;
+  font-size:0.8rem;color:var(--accent2);
+  display:flex;align-items:flex-start;gap:8px;
+}
+.dml-affected{
+  background:rgba(79,255,176,0.06);border:1px solid rgba(79,255,176,0.2);
+  border-radius:7px;padding:0.6rem 1rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent);
+}
+.ddl-note{
+  background:rgba(130,170,255,0.06);border:1px solid rgba(130,170,255,0.2);
+  border-radius:7px;padding:0.8rem 1rem;font-size:0.82rem;color:var(--fn);
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .hero h1{font-size:1.9rem;}
+  .nav-brand{font-size:0.85rem;margin-right:1rem;}
+  .nav-links button{padding:0 0.7rem;font-size:0.75rem;}
+  .content{padding:0.5rem 1rem 4rem;}
+  .hero{padding:2rem 1rem 1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">SQL<span>.learn</span></div>
+  <div class="nav-links">
+    <button class="active" onclick="showPage('beginner',this)">🟢 Beginner</button>
+    <button onclick="showPage('intermediate',this)">🟡 Intermediate</button>
+    <button onclick="showPage('advanced',this)">🔴 Advanced</button>
+    <button onclick="showPage('tables',this)">🗄️ Tables</button>
+    <button onclick="showPage('practice',this)">📝 Practice</button>
+    <button onclick="showPage('dml',this)">⚙️ DML</button>
+    <button onclick="showPage('about',this)">👤 About</button>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     BEGINNER PAGE
+════════════════════════════════════════════════════ -->
+<div id="page-beginner" class="page active">
+  <div class="hero">
+    <div class="level-badge badge-beginner">● Beginner Level</div>
+    <h1>SQL <span style="color:var(--accent)">Basics</span></h1>
+    <p>SELECT, WHERE, ORDER BY, LIKE, IN, UNION and more. Every query has a Run button, output table, and explanation.</p>
+  </div>
+  <div class="expand-bar">
+    <button class="expand-all-btn" onclick="expandAll('content-beginner')">▼ Expand All</button>
+    <button class="expand-all-btn" onclick="collapseAll('content-beginner')">▲ Collapse All</button>
+  </div>
+  <div class="content" id="content-beginner"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     INTERMEDIATE PAGE
+════════════════════════════════════════════════════ -->
+<div id="page-intermediate" class="page">
+  <div class="hero">
+    <div class="level-badge badge-intermediate">● Intermediate Level</div>
+    <h1>SQL <span style="color:var(--accent3)">Deeper</span></h1>
+    <p>GROUP BY, Aggregates, JOINs, Subqueries, String and Date Functions.</p>
+  </div>
+  <div class="expand-bar">
+    <button class="expand-all-btn" onclick="expandAll('content-intermediate')">▼ Expand All</button>
+    <button class="expand-all-btn" onclick="collapseAll('content-intermediate')">▲ Collapse All</button>
+  </div>
+  <div class="content" id="content-intermediate"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     ADVANCED PAGE
+════════════════════════════════════════════════════ -->
+<div id="page-advanced" class="page">
+  <div class="hero">
+    <div class="level-badge badge-advanced">● Advanced Level</div>
+    <h1>SQL <span style="color:var(--accent2)">Window Functions</span></h1>
+    <p>ROW_NUMBER, RANK, DENSE_RANK, LEAD, LAG — and all ROWS / RANGE BETWEEN frame types.</p>
+  </div>
+  <div class="expand-bar">
+    <button class="expand-all-btn" onclick="expandAll('content-advanced')">▼ Expand All</button>
+    <button class="expand-all-btn" onclick="collapseAll('content-advanced')">▲ Collapse All</button>
+  </div>
+  <div class="content" id="content-advanced"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TABLES PAGE
+════════════════════════════════════════════════════ -->
+<div id="page-tables" class="page">
+  <div class="hero">
+    <div class="level-badge" style="background:rgba(137,221,255,0.08);border-color:rgba(137,221,255,0.3);color:var(--op);">● Dataset</div>
+    <h1>The <span style="color:var(--op)">Tables</span></h1>
+    <p>The dataset used across all queries — browse the data and run quick queries directly.</p>
+  </div>
+  <div class="tables-grid" id="content-tables"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PRACTICE PAGE
+════════════════════════════════════════════════════ -->
+<div id="page-practice" class="page">
+  <div class="hero">
+    <div class="level-badge" style="background:rgba(199,146,234,0.08);border-color:rgba(199,146,234,0.3);color:var(--kw);">● Practice</div>
+    <h1>Practice <span style="color:var(--kw)">Questions</span></h1>
+    <p>23 questions across all levels. Click the arrow on any question to reveal the answer SQL and output.</p>
+  </div>
+  <div class="practice-tabs">
+    <button class="practice-tab active" onclick="switchPracticeTab('beg',this)">🟢 Beginner</button>
+    <button class="practice-tab" onclick="switchPracticeTab('int',this)">🟡 Intermediate</button>
+    <button class="practice-tab" onclick="switchPracticeTab('adv',this)">🔴 Advanced</button>
+    <button class="practice-tab" onclick="switchPracticeTab('dml',this)">⚙️ DML</button>
+  </div>
+  <div class="practice-content">
+    <div id="practice-beg" class="practice-level active"></div>
+    <div id="practice-int" class="practice-level"></div>
+    <div id="practice-adv" class="practice-level"></div>
+    <div id="practice-dml" class="practice-level"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     DML PAGE
+════════════════════════════════════════════════════ -->
+<div id="page-dml" class="page">
+  <div class="hero">
+    <div class="level-badge" style="background:rgba(255,107,107,0.08);border-color:rgba(255,107,107,0.3);color:var(--accent2);">● DML / DDL</div>
+    <h1>Data <span style="color:var(--accent2)">Modification</span></h1>
+    <p>DELETE, TRUNCATE, UPDATE, and ALTER TABLE — how to modify, remove, and restructure your data and tables.</p>
+  </div>
+  <div class="dml-content" id="content-dml"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     ABOUT PAGE
+════════════════════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <div style="max-width:600px;margin:0 auto;padding:5rem 2rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem;">
+    <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,rgba(79,255,176,0.2),rgba(130,170,255,0.2));border:2px solid rgba(79,255,176,0.3);display:flex;align-items:center;justify-content:center;font-size:2.2rem;">👨‍💻</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);">Made by</div>
+      <div style="font-size:2.4rem;font-weight:800;letter-spacing:-1.5px;color:var(--text);">Omar Mahmoud</div>
+    </div>
+    <div style="width:48px;height:2px;background:linear-gradient(90deg,var(--accent),var(--fn));border-radius:2px;"></div>
+    <p style="color:var(--muted);font-size:0.95rem;line-height:1.7;max-width:420px;">
+      A hands-on SQL learning reference covering Beginner, Intermediate, and Advanced topics — with simulated query execution, Arabic explanations, and keyword notes.
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:0.5rem;">
+      <div style="background:#0a0c10;border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent);">PostgreSQL Syntax</div>
+      <div style="background:#0a0c10;border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--fn);">JS Simulation</div>
+      <div style="background:#0a0c10;border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent3);">Egyptian Arabic</div>
+      <div style="background:#0a0c10;border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--kw);">Dark Mode</div>
+    </div>
+    <a href="https://www.linkedin.com/in/omar-mahmoud-13458a371" target="_blank" style="
+      display:inline-flex;align-items:center;gap:10px;
+      background:#0a0c10;border:1px solid rgba(10,102,194,0.4);
+      border-radius:10px;padding:12px 24px;text-decoration:none;
+      color:#fff;font-size:0.9rem;font-weight:700;
+      transition:all 0.2s;margin-top:0.5rem;
+    " onmouseover="this.style.borderColor='rgba(10,102,194,0.9)';this.style.background='rgba(10,102,194,0.12)'" onmouseout="this.style.borderColor='rgba(10,102,194,0.4)';this.style.background='#0a0c10'">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      Connect on LinkedIn
+    </a>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATASET
+══════════════════════════════════════════ */
+const employees = [
+  {id:1, name:'Ahmed Ali',      salary:9000,  dept:'Engineering', age:30, date_of_joining:'2020-03-15'},
+  {id:2, name:'Sara Mohamed',   salary:7500,  dept:'HR',          age:27, date_of_joining:'2021-07-01'},
+  {id:3, name:'Omar Hassan',    salary:12000, dept:'Engineering', age:35, date_of_joining:'2018-11-20'},
+  {id:4, name:'Nour Khalil',    salary:6800,  dept:'Marketing',   age:24, date_of_joining:'2023-01-10'},
+  {id:5, name:'Khaled Samir',   salary:11000, dept:'Engineering', age:33, date_of_joining:'2019-05-08'},
+  {id:6, name:'Mona Adel',      salary:8200,  dept:'HR',          age:29, date_of_joining:'2022-04-22'},
+  {id:7, name:'Youssef Tarek',  salary:14000, dept:'Management',  age:42, date_of_joining:'2015-09-01'},
+  {id:8, name:'Layla Ibrahim',  salary:7000,  dept:'Marketing',   age:26, date_of_joining:'2022-12-05'},
+  {id:9, name:'Hassan Farouk',  salary:9500,  dept:'Engineering', age:31, date_of_joining:'2020-08-14'},
+  {id:10,name:'Dina Mahmoud',   salary:6500,  dept:'HR',          age:25, date_of_joining:'2023-06-30'},
+];
+
+const departments = [
+  {dept_id:1, dept_name:'Engineering', location:'Cairo',      budget:500000},
+  {dept_id:2, dept_name:'HR',          location:'Alexandria', budget:200000},
+  {dept_id:3, dept_name:'Marketing',   location:'Cairo',      budget:150000},
+  {dept_id:4, dept_name:'Management',  location:'Giza',       budget:800000},
+  {dept_id:5, dept_name:'Finance',     location:'Cairo',      budget:300000},
+];
+
+const messages = [
+  {id:1,  sender:'Ahmed Ali',      content:'Meeting at 10am sharp',          category:'work'},
+  {id:2,  sender:'Sara Mohamed',   content:'Call me on 01012345678',          category:'personal'},
+  {id:3,  sender:'Omar Hassan',    content:'Report due 2024-12-31 please',    category:'work'},
+  {id:4,  sender:'Nour Khalil',    content:'hello@company.com has been sent', category:'email'},
+  {id:5,  sender:'Khaled Samir',   content:'Budget approved for $5000 now',   category:'finance'},
+  {id:6,  sender:'Mona Adel',      content:'ERROR: server connection failed', category:'system'},
+  {id:7,  sender:'Youssef Tarek',  content:'Task is DONE by this Friday',     category:'work'},
+  {id:8,  sender:'Layla Ibrahim',  content:'user@gmail.com signup confirmed',  category:'email'},
+  {id:9,  sender:'Hassan Farouk',  content:'Price reduced to $120 only',      category:'finance'},
+  {id:10, sender:'Dina Mahmoud',   content:'WARNING: disk usage is 90% full', category:'system'},
+];
+
+/* ══════════════════════════════════════════
+   PAGE SWITCHER
+══════════════════════════════════════════ */
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  document.getElementById('theme-btn').textContent = isLight ? '🌙 Dark' : '☀️ Light';
+}
+
+function toggleCard(id) {
+  document.getElementById('card-' + id).classList.toggle('expanded');
+}
+
+function expandAll(containerId) {
+  document.getElementById(containerId).querySelectorAll('.qcard').forEach(c => c.classList.add('expanded'));
+}
+
+function collapseAll(containerId) {
+  document.getElementById(containerId).querySelectorAll('.qcard').forEach(c => c.classList.remove('expanded'));
+}
+
+function copySQL(btn) {
+  const block = btn.parentElement;
+  const text = block.innerText.replace('COPY','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ DONE';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'COPY';
+      btn.classList.remove('copied');
+    }, 1500);
+  });
+}
+
+/* ══════════════════════════════════════════
+   RENDER ENGINE
+══════════════════════════════════════════ */
+function renderTable(rows) {
+  if (!rows || rows.length === 0) return '<div class="no-rows">— No rows returned —</div>';
+  const cols = Object.keys(rows[0]);
+  let html = '<div class="table-wrap"><table><thead><tr>';
+  cols.forEach(c => html += `<th>${c}</th>`);
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr>';
+    cols.forEach(c => html += `<td>${r[c] === null || r[c] === undefined ? '<span style="color:var(--muted)">NULL</span>' : r[c]}</td>`);
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function buildPills(pills) {
+  if (!pills || pills.length === 0) return '';
+  let html = '<div class="kpills">';
+  pills.forEach(p => {
+    html += `<div class="kpill"><span class="kpill-key ${p.keyColor}">${p.key}</span><span class="kpill-sep">→</span><span class="kpill-desc">${p.desc}</span></div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function buildCard({id, title, tag, tagClass, sql, run, expAr, expEn, note, pills, framePills, glowKw, regexTable}) {
+  const companions = {
+    'GROUP':['GROUP','BY'],'ORDER':['ORDER','BY'],
+    'PARTITION':['PARTITION','BY'],
+    'IS':['IS','NULL','NOT'],
+    'INNER':['INNER','JOIN'],'LEFT':['LEFT','JOIN'],'RIGHT':['RIGHT','JOIN'],
+  };
+  const renderedSql = glowKw ? (() => {
+    const gWords = Array.isArray(glowKw) ? glowKw : [glowKw];
+    const allGlow = new Set();
+    gWords.forEach(w => (companions[w] || [w]).forEach(x => allGlow.add(x)));
+    return sql.replace(/<span class="(kw|fn)">(\w+)<\/span>/g, (match, cls, word) => {
+      if (allGlow.has(word)) {
+        const gc = cls === 'fn' ? 'glow-fn' : 'glow-kw';
+        return `<span class="${cls} ${gc}">${word}</span>`;
+      }
+      return match;
+    });
+  })() : sql;
+
+  const regexTableHtml = regexTable ? `
+    <div class="regex-wrap">
+      <table class="regex-table">
+        <thead><tr><th>Pattern</th><th>Meaning</th><th>Example</th></tr></thead>
+        <tbody>
+          ${regexTable.map(r=>`
+          <tr>
+            <td><span class="regex-pat ${r.op?'op':''}">${r.pat}</span></td>
+            <td class="regex-meaning">${r.meaning}</td>
+            <td class="regex-example">${r.example}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+      <div style="background:rgba(79,255,176,0.05);border:1px solid rgba(79,255,176,0.25);border-radius:10px;padding:1rem;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:6px;">[ ] — OR logic</div>
+        <div style="font-size:0.82rem;color:var(--text);line-height:1.6;margin-bottom:10px;">Match <strong>any one</strong> character from the list — only one needs to match.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--accent)">[aeiou]</span>
+            <span style="color:var(--muted)"> → any vowel — a <strong>OR</strong> e <strong>OR</strong> i <strong>OR</strong> o <strong>OR</strong> u</span>
+          </div>
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--accent)">[A-Z]</span>
+            <span style="color:var(--muted)"> → any uppercase letter from A to Z</span>
+          </div>
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--accent)">[0-9]</span>
+            <span style="color:var(--muted)"> → any digit from 0 to 9</span>
+          </div>
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--accent2)">[^abc]</span>
+            <span style="color:var(--muted)"> → ^ inside [] means NOT — not a, b, or c</span>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:0.78rem;color:var(--muted);direction:rtl;text-align:right;line-height:1.6;">
+          [] بتقول "أي حاجة من دول" — زي OR — بس حرف واحد بس من الأختيارات
+        </div>
+      </div>
+      <div style="background:rgba(130,170,255,0.05);border:1px solid rgba(130,170,255,0.25);border-radius:10px;padding:1rem;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--fn);margin-bottom:6px;">( ) — Exact sequence</div>
+        <div style="font-size:0.82rem;color:var(--text);line-height:1.6;margin-bottom:10px;">Match <strong>this exact order</strong> of characters — all of them, in sequence.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--fn)">(error)</span>
+            <span style="color:var(--muted)"> → must contain exactly <strong>e-r-r-o-r</strong> in that order</span>
+          </div>
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--fn)">(error|warning)</span>
+            <span style="color:var(--muted)"> → exactly "error" <strong>OR</strong> exactly "warning"</span>
+          </div>
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--fn)">([0-9]{4})</span>
+            <span style="color:var(--muted)"> → group: exactly 4 digits — treat as one unit</span>
+          </div>
+          <div style="background:#0a0c10;border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+            <span style="color:var(--fn)">(ha)+</span>
+            <span style="color:var(--muted)"> → "ha" repeated — haha, hahaha, etc.</span>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:0.78rem;color:var(--muted);direction:rtl;text-align:right;line-height:1.6;">
+          () بتقول "الكلمة دي بالظبط بالترتيب ده" — بتجمع حروف مع بعض كوحدة واحدة
+        </div>
+      </div>
+    </div>
+    <div style="background:rgba(255,209,102,0.05);border:1px solid rgba(255,209,102,0.2);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1rem;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent3);margin-bottom:8px;">📌 Key difference</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">
+        <div style="background:#0a0c10;border-radius:6px;padding:7px 12px;">
+          <span style="color:var(--accent)">[abc]</span>
+          <span style="color:var(--muted)"> → matches </span><span style="color:var(--str)">'a'</span><span style="color:var(--muted)">, </span><span style="color:var(--str)">'b'</span><span style="color:var(--muted)">, or </span><span style="color:var(--str)">'c'</span><span style="color:var(--muted)"> — <strong>1 character, 3 choices</strong></span>
+        </div>
+        <div style="background:#0a0c10;border-radius:6px;padding:7px 12px;">
+          <span style="color:var(--fn)">(abc)</span>
+          <span style="color:var(--muted)"> → matches </span><span style="color:var(--str)">'abc'</span><span style="color:var(--muted)"> only — <strong>3 characters, exact order</strong></span>
+        </div>
+        <div style="background:#0a0c10;border-radius:6px;padding:7px 12px;">
+          <span style="color:var(--accent)">[abc]</span><span style="color:var(--muted)">+</span>
+          <span style="color:var(--muted)"> → one or more of a/b/c in any order: </span><span style="color:var(--str)">'abca'</span><span style="color:var(--muted)">, </span><span style="color:var(--str)">'bbb'</span><span style="color:var(--muted)">, </span><span style="color:var(--str)">'cab'</span>
+        </div>
+        <div style="background:#0a0c10;border-radius:6px;padding:7px 12px;">
+          <span style="color:var(--fn)">(abc)</span><span style="color:var(--muted)">+</span>
+          <span style="color:var(--muted)"> → "abc" repeated: </span><span style="color:var(--str)">'abc'</span><span style="color:var(--muted)">, </span><span style="color:var(--str)">'abcabc'</span><span style="color:var(--muted)"> — never </span><span style="color:var(--str)">'bca'</span>
+        </div>
+      </div>
+    </div>` : '';
+
+  return `
+  <div class="qcard" id="card-${id}">
+    <div class="qcard-header" onclick="toggleCard('${id}')">
+      <div class="qcard-title">
+        <span class="qtag ${tagClass}">${tag}</span>
+        ${title}
+      </div>
+      <span class="qcard-chevron">▼</span>
+    </div>
+    <div class="qcard-body">
+      <div style="display:flex;justify-content:flex-end;padding-top:0.2rem;">
+        <button class="run-btn" onclick="event.stopPropagation();runQuery('${id}')">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>
+          Run
+        </button>
+      </div>
+      ${regexTableHtml}
+      <div class="query-block"><button class="copy-btn" onclick="copySQL(this)">COPY</button>${renderedSql}</div>
+      ${note ? `<div class="note-box"><div class="note-title">📌 Note</div><div class="note-ar">${note.ar}</div><div class="note-en">${note.en}</div></div>` : ''}
+      <div class="explanation">
+        <div class="exp-ar">${expAr}</div>
+        <div class="exp-en">${expEn}</div>
+        ${buildPills(pills)}
+      </div>
+      ${framePills ? `<div class="note-box"><div class="note-title">📌 Frame Keywords</div>${buildPills(framePills)}</div>` : ''}
+      <div class="output-area" id="out-${id}">
+        <div class="output-label">Output <span id="count-${id}">0 rows</span></div>
+        <div id="table-${id}"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function runQuery(id) {
+  const outArea = document.getElementById('out-' + id);
+  const tableDiv = document.getElementById('table-' + id);
+  const countEl = document.getElementById('count-' + id);
+  const fn = queryFunctions[id];
+  if (!fn) return;
+  const rows = fn();
+  tableDiv.innerHTML = renderTable(rows);
+  countEl.textContent = (rows ? rows.length : 0) + ' rows';
+  outArea.classList.add('visible');
+}
+
+/* ══════════════════════════════════════════
+   SYNTAX HIGHLIGHT HELPER
+══════════════════════════════════════════ */
+function hl(sql, glowWords) {
+  const keywords = ['SELECT','FROM','WHERE','AND','OR','NOT','IN','BETWEEN','LIKE','ORDER','BY','ASC','DESC','LIMIT','UNION','ALL','EXCEPT','INTERSECT','GROUP','HAVING','JOIN','INNER','LEFT','RIGHT','ON','AS','DISTINCT','CASE','WHEN','THEN','ELSE','END','NULL','IS','OVER','PARTITION','ROWS','RANGE','UNBOUNDED','PRECEDING','FOLLOWING','CURRENT','ROW','WITH','TIES','FILTER','NULLIF','COALESCE','CAST','TRIM','REPLACE','CONCAT','EXISTS'];
+  const functions = ['COUNT','SUM','AVG','MIN','MAX','UPPER','LOWER','LENGTH','SUBSTRING','NOW','CURRENT_DATE','EXTRACT','ROW_NUMBER','RANK','DENSE_RANK','LEAD','LAG','COALESCE','CAST','ROUND','CEIL','FLOOR','CONCAT_WS','DATE_TRUNC','FIRST_VALUE','LAST_VALUE','NTILE','PERCENT_RANK','CONCAT','TRIM','REPLACE','NULLIF'];
+  let result = sql
+    .replace(/--[^\n]*/g, m => `<span class="cm">${m}</span>`)
+    .replace(/'[^']*'/g, m => `<span class="str">${m}</span>`)
+    .replace(/\b(\d+)\b/g, '<span class="num">$1</span>');
+  functions.forEach(f => {
+    result = result.replace(new RegExp(`\\b(${f})\\b`, 'g'), '<span class="fn">$1</span>');
+  });
+  keywords.forEach(k => {
+    result = result.replace(new RegExp(`\\b(${k})\\b`, 'g'), '<span class="kw">$1</span>');
+  });
+  // apply glow to specified words
+  if (glowWords) {
+    (Array.isArray(glowWords) ? glowWords : [glowWords]).forEach(w => {
+      const isFn = functions.includes(w.toUpperCase());
+      const glowClass = isFn ? 'glow-fn' : 'glow-kw';
+      // replace already-wrapped span or bare word
+      result = result.replace(
+        new RegExp(`<span class="(kw|fn)">(${w})</span>`, 'g'),
+        `<span class="$1 ${glowClass}">$2</span>`
+      );
+    });
+  }
+  return result;
+}
+
+/* ══════════════════════════════════════════
+   QUERY FUNCTIONS
+══════════════════════════════════════════ */
+const queryFunctions = {};
+
+/* ─────────── BEGINNER ─────────── */
+queryFunctions['b1'] = () => employees.map(e=>({id:e.id,name:e.name,salary:e.salary,dept:e.dept,age:e.age,date_of_joining:e.date_of_joining}));
+queryFunctions['b2'] = () => employees.filter(e=>e.dept==='Engineering').map(e=>({id:e.id,name:e.name,dept:e.dept,salary:e.salary}));
+queryFunctions['b3'] = () => employees.filter(e=>e.dept==='Engineering' && e.salary>10000).map(e=>({name:e.name,dept:e.dept,salary:e.salary}));
+queryFunctions['b4'] = () => employees.filter(e=>e.dept==='Engineering' || e.dept==='HR').map(e=>({name:e.name,dept:e.dept,salary:e.salary}));
+queryFunctions['b5'] = () => employees.filter(e=>e.salary>=8000 && e.salary<=12000).map(e=>({name:e.name,salary:e.salary}));
+queryFunctions['b6'] = () => employees.filter(e=>e.name.startsWith('A')).map(e=>({name:e.name,dept:e.dept}));
+queryFunctions['b7'] = () => employees.filter(e=>e.name.includes('a')||e.name.includes('A')).filter(e=>e.name.includes(' ')).map(e=>({name:e.name,dept:e.dept}));
+queryFunctions['b8'] = () => employees.filter(e=>['Engineering','Management'].includes(e.dept)).map(e=>({name:e.name,dept:e.dept,salary:e.salary}));
+queryFunctions['b9'] = () => employees.filter(e=>!['Engineering','Management'].includes(e.dept)).map(e=>({name:e.name,dept:e.dept,salary:e.salary}));
+queryFunctions['b10'] = () => [...employees].sort((a,b)=>b.salary-a.salary).map(e=>({name:e.name,salary:e.salary}));
+queryFunctions['b11'] = () => [...employees].sort((a,b)=>b.salary-a.salary).slice(0,3).map(e=>({name:e.name,salary:e.salary}));
+queryFunctions['b12'] = () => {
+  const eng = employees.filter(e=>e.dept==='Engineering').map(e=>({name:e.name,dept:e.dept}));
+  const hr  = employees.filter(e=>e.dept==='HR').map(e=>({name:e.name,dept:e.dept}));
+  const all = [...eng,...hr];
+  const seen=new Set(); return all.filter(r=>{const k=r.name+'|'+r.dept; if(seen.has(k))return false; seen.add(k);return true;});
+};
+queryFunctions['b13'] = () => {
+  const eng = employees.filter(e=>e.dept==='Engineering').map(e=>e.name);
+  const hr  = employees.filter(e=>e.dept==='HR').map(e=>e.name);
+  return eng.filter(n=>hr.includes(n)).map(n=>({name:n,note:'In Both'}));
+};
+queryFunctions['b14'] = () => {
+  const eng = employees.filter(e=>e.dept==='Engineering').map(e=>e.name);
+  const hr  = employees.filter(e=>e.dept==='HR').map(e=>e.name);
+  return eng.filter(n=>!hr.includes(n)).map(n=>({name:n,dept:'Engineering only'}));
+};
+
+/* ─────────── INTERMEDIATE ─────────── */
+queryFunctions['m1'] = () => {
+  const g={}; employees.forEach(e=>{if(!g[e.dept])g[e.dept]={dept:e.dept,count:0}; g[e.dept].count++;});
+  return Object.values(g).sort((a,b)=>b.count-a.count);
+};
+queryFunctions['m2'] = () => {
+  const g={}; employees.forEach(e=>{if(!g[e.dept])g[e.dept]={dept:e.dept,total_salary:0}; g[e.dept].total_salary+=e.salary;});
+  return Object.values(g).sort((a,b)=>b.total_salary-a.total_salary);
+};
+queryFunctions['m3'] = () => {
+  const g={}; employees.forEach(e=>{if(!g[e.dept])g[e.dept]={dept:e.dept,avg_salary:0,_sum:0,_cnt:0}; g[e.dept]._sum+=e.salary; g[e.dept]._cnt++;});
+  return Object.values(g).filter(r=>{r.avg_salary=Math.round(r._sum/r._cnt); delete r._sum; delete r._cnt; return r.avg_salary>7000;}).sort((a,b)=>b.avg_salary-a.avg_salary);
+};
+queryFunctions['m4'] = () => {
+  const g={}; employees.forEach(e=>{if(!g[e.dept])g[e.dept]={dept:e.dept,count:0,avg:0,min:Infinity,max:-Infinity,_sum:0}; g[e.dept].count++; g[e.dept]._sum+=e.salary; if(e.salary<g[e.dept].min)g[e.dept].min=e.salary; if(e.salary>g[e.dept].max)g[e.dept].max=e.salary;});
+  return Object.values(g).map(r=>({dept:r.dept,count:r.count,avg_salary:Math.round(r._sum/r.count),min_salary:r.min,max_salary:r.max}));
+};
+queryFunctions['m5'] = () => {
+  const avg=employees.reduce((s,e)=>s+e.salary,0)/employees.length;
+  return employees.filter(e=>e.salary>avg).map(e=>({name:e.name,salary:e.salary,dept:e.dept}));
+};
+queryFunctions['m6'] = () => {
+  const maxSalary=Math.max(...employees.map(e=>e.salary));
+  return employees.filter(e=>e.salary===maxSalary).map(e=>({name:e.name,salary:e.salary,dept:e.dept}));
+};
+queryFunctions['m7'] = () => {
+  return employees.map(e=>({
+    ...departments.find(d=>d.dept_name===e.dept)
+      ? {name:e.name,emp_dept:e.dept,dept_name:departments.find(d=>d.dept_name===e.dept).dept_name,location:departments.find(d=>d.dept_name===e.dept).location}
+      : null
+  })).filter(Boolean);
+};
+queryFunctions['m8'] = () => {
+  return employees.map(e=>{
+    const d=departments.find(d=>d.dept_name===e.dept);
+    return {name:e.name,emp_dept:e.dept,dept_name:d?d.dept_name:'NULL',location:d?d.location:'NULL'};
+  });
+};
+queryFunctions['m9'] = () => {
+  return departments.map(d=>{
+    const emps=employees.filter(e=>e.dept===d.dept_name);
+    if(emps.length===0) return [{name:'NULL',emp_dept:'NULL',dept_name:d.dept_name,location:d.location}];
+    return emps.map(e=>({name:e.name,emp_dept:e.dept,dept_name:d.dept_name,location:d.location}));
+  }).flat();
+};
+queryFunctions['m10'] = () => employees.map(e=>({name:e.name,upper_name:e.name.toUpperCase(),lower_name:e.name.toLowerCase(),name_length:e.name.length,first_5:e.name.substring(0,5)}));
+queryFunctions['m11'] = () => {
+  const today=new Date('2024-01-15');
+  return employees.map(e=>{
+    const joined=new Date(e.date_of_joining);
+    const years=Math.floor((today-joined)/(365.25*24*3600*1000));
+    return {name:e.name,date_of_joining:e.date_of_joining,join_year:joined.getFullYear(),years_in_company:years};
+  });
+};
+
+/* ─────────── ADVANCED ─────────── */
+queryFunctions['a1'] = () => {
+  let i=1; return [...employees].sort((a,b)=>b.salary-a.salary).map(e=>({row_number:i++,name:e.name,salary:e.salary,dept:e.dept}));
+};
+queryFunctions['a2'] = () => {
+  const sorted=[...employees].sort((a,b)=>b.salary-a.salary);
+  let rank=1,prev=null,skip=0;
+  return sorted.map(e=>{
+    if(e.salary!==prev){rank+=skip;skip=1;}else{skip++;}
+    const r=rank; prev=e.salary;
+    return {rank:r,name:e.name,salary:e.salary};
+  });
+};
+queryFunctions['a3'] = () => {
+  const sorted=[...employees].sort((a,b)=>b.salary-a.salary);
+  let rank=1,prev=null;
+  return sorted.map(e=>{
+    if(e.salary!==prev){rank++;}
+    prev=e.salary;
+    return {dense_rank:rank-1,name:e.name,salary:e.salary};
+  });
+};
+queryFunctions['a4'] = () => {
+  const byDept={};
+  employees.forEach(e=>{if(!byDept[e.dept])byDept[e.dept]=[];byDept[e.dept].push(e);});
+  const result=[];
+  Object.values(byDept).forEach(arr=>{
+    const sorted=arr.sort((a,b)=>b.salary-a.salary);
+    let i=1; sorted.forEach(e=>result.push({dept_rank:i++,name:e.name,dept:e.dept,salary:e.salary}));
+  });
+  return result.sort((a,b)=>a.dept.localeCompare(b.dept)||a.dept_rank-b.dept_rank);
+};
+queryFunctions['a5'] = () => {
+  const sorted=[...employees].sort((a,b)=>a.id-b.id);
+  return sorted.map((e,i)=>({name:e.name,salary:e.salary,next_salary:i<sorted.length-1?sorted[i+1].salary:null}));
+};
+queryFunctions['a6'] = () => {
+  const sorted=[...employees].sort((a,b)=>a.id-b.id);
+  return sorted.map((e,i)=>({name:e.name,salary:e.salary,prev_salary:i>0?sorted[i-1].salary:null}));
+};
+
+// Window Frame comprehensive example
+queryFunctions['a7'] = () => {
+  const sorted=[...employees].sort((a,b)=>a.id-b.id);
+  const n=sorted.length;
+  const total=sorted.reduce((s,e)=>s+e.salary,0);
+  return sorted.map((e,i)=>{
+    const running_sum=sorted.slice(0,i+1).reduce((s,x)=>s+x.salary,0);
+    const reverse_sum=sorted.slice(i).reduce((s,x)=>s+x.salary,0);
+    const prev_win=i>=1?sorted.slice(Math.max(0,i-1),i+1).reduce((s,x)=>s+x.salary,0):null;
+    const next_win=i<n-1?sorted.slice(i,Math.min(n,i+2)).reduce((s,x)=>s+x.salary,0):null;
+    const current_only=e.salary;
+    const rows_win=sorted.slice(Math.max(0,i-1),i+2).reduce((s,x)=>s+x.salary,0);
+    return {
+      name:e.name,
+      salary:e.salary,
+      running_sum,
+      reverse_sum,
+      prev_window_sum:prev_win,
+      next_window_sum:next_win,
+      current_only,
+      full_sum:total,
+      rows_window_sum:rows_win,
+    };
+  });
+};
+
+/* ══════════════════════════════════════════
+   BUILD BEGINNER CARDS
+══════════════════════════════════════════ */
+const beginnerCards = [
+  {
+    sectionLabel:'SELECT',
+    cards:[
+      {id:'b1',title:'SELECT *',tag:'SELECT',tagClass:'qtag-select',
+       sql:hl(`SELECT *\nFROM employees;`),
+       glowKw:'SELECT',
+       expAr:'بنجيب كل البيانات من جدول الموظفين — كل الأعمدة وكل الصفوف.',
+       expEn:'Fetches every column and every row from the employees table.'},
+      {id:'b2',title:'WHERE',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT id, name, dept, salary\nFROM employees\nWHERE dept = 'Engineering';`),
+       glowKw:'WHERE',
+       expAr:'بنجيب بس الموظفين اللي في قسم الـ Engineering — WHERE بتفلتر الصفوف على حسب شرط.',
+       expEn:'WHERE filters rows — only employees where dept equals Engineering are returned.'},
+    ]
+  },
+  {
+    sectionLabel:'AND / OR / BETWEEN / LIKE',
+    cards:[
+      {id:'b3',title:'WHERE + AND',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept, salary\nFROM employees\nWHERE dept = 'Engineering'\n  AND salary > 10000;`),
+       glowKw:'AND',
+       expAr:'AND معناها الشرطين لازم يتحققوا مع بعض — Engineering وراتب أكبر من ١٠٠٠٠.',
+       expEn:'AND requires BOTH conditions to be true simultaneously.'},
+      {id:'b4',title:'WHERE + OR',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept, salary\nFROM employees\nWHERE dept = 'Engineering'\n   OR dept = 'HR';`),
+       glowKw:'OR',
+       expAr:'OR معناها يكفي شرط واحد يتحقق — Engineering أو HR.',
+       expEn:'OR returns rows where at least one condition is true.'},
+      {id:'b5',title:'BETWEEN',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, salary\nFROM employees\nWHERE salary BETWEEN 8000 AND 12000;`),
+       glowKw:'BETWEEN',
+       expAr:'BETWEEN بتجيب القيم اللي بين حدين — ٨٠٠٠ و١٢٠٠٠ مشمولين في النطاق.',
+       expEn:'BETWEEN is inclusive — rows where salary >= 8000 AND salary <= 12000.',
+       pills:[
+         {key:'BETWEEN a AND b', keyColor:'green',  desc:'inclusive on both ends — a ≤ x ≤ b'},
+         {key:'NOT BETWEEN',     keyColor:'red',    desc:'everything outside the range'},
+       ]},
+      {id:'b6',title:'LIKE %',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept\nFROM employees\nWHERE name LIKE 'A%';`),
+       glowKw:'LIKE',
+       expAr:"LIKE مع % بتدوّر على نمط في النص — 'A%' يعني يبدأ بـ A وبعدها أي حاجة.",
+       expEn:"% matches zero or more characters — 'A%' means starts with A followed by anything.",
+       pills:[
+         {key:'%', keyColor:'green', desc:'0 or more characters'},
+         {key:"'A%'", keyColor:'yellow', desc:'starts with A'},
+         {key:"'%ali'", keyColor:'yellow', desc:'ends with ali'},
+         {key:"'%mo%'", keyColor:'yellow', desc:'contains mo anywhere'},
+       ]},
+      {id:'b7',title:'LIKE _',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept\nFROM employees\nWHERE name LIKE '___a%';`),
+       glowKw:'LIKE',
+       expAr:"_ بتمثل حرف واحد بالظبط — '___a%' يعني الحرف الرابع هو a.",
+       expEn:"_ matches exactly one character — useful when you know the position of a character.",
+       pills:[
+         {key:'_', keyColor:'purple', desc:'exactly 1 character'},
+         {key:"'___a%'", keyColor:'yellow', desc:'4th char is a'},
+         {key:"'_r%'", keyColor:'yellow', desc:'2nd char is r'},
+         {key:"'A___'", keyColor:'yellow', desc:'starts A, exactly 4 chars total'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'IN / NOT IN',
+    cards:[
+      {id:'b8',title:'IN',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept, salary\nFROM employees\nWHERE dept IN ('Engineering', 'Management');`),
+       glowKw:'IN',
+       expAr:'IN بدل ما تكتب OR كتير — بتجيب الصفوف اللي القيمة فيها موجودة في القايمة.',
+       expEn:'IN is shorthand for multiple OR conditions — cleaner and more readable.',
+       pills:[
+         {key:'IN (a, b, c)',     keyColor:'green',  desc:'same as: = a OR = b OR = c'},
+         {key:'NOT IN (a, b, c)', keyColor:'red',    desc:'same as: ≠ a AND ≠ b AND ≠ c'},
+       ]},
+      {id:'b9',title:'NOT IN',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept, salary\nFROM employees\nWHERE dept NOT IN ('Engineering', 'Management');`),
+       glowKw:'IN',
+       expAr:'NOT IN عكس IN — بتجيب الصفوف اللي القيمة مش موجودة في القايمة.',
+       expEn:'NOT IN excludes all rows matching the list — returns everything else.'},
+    ]
+  },
+  {
+    sectionLabel:'ORDER BY / LIMIT',
+    cards:[
+      {id:'b10',title:'ORDER BY',tag:'SORT',tagClass:'qtag-sort',
+       sql:hl(`SELECT name, salary\nFROM employees\nORDER BY salary DESC;`),
+       glowKw:'ORDER',
+       expAr:'ORDER BY بترتب النتايج — DESC تنازلي (الأكبر الأول)، ASC تصاعدي (الأصغر الأول).',
+       expEn:'ORDER BY sorts results — DESC is descending (highest first), ASC is ascending.',
+       pills:[
+         {key:'ASC',  keyColor:'blue',   desc:'smallest → largest (default if omitted)'},
+         {key:'DESC', keyColor:'purple', desc:'largest → smallest'},
+         {key:'ORDER BY a, b', keyColor:'yellow', desc:'sort by a first, then b for ties'},
+       ]},
+      {id:'b11',title:'LIMIT',tag:'SORT',tagClass:'qtag-sort',
+       sql:hl(`SELECT name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3;`),
+       glowKw:'LIMIT',
+       expAr:'LIMIT بتحدد أقصى عدد من الصفوف اللي ترجع — هنا الـ ٣ الأعلى راتباً.',
+       expEn:'LIMIT caps the number of returned rows — here we get the top 3 earners.'},
+    ]
+  },
+  {
+    sectionLabel:'UNION / INTERSECT / EXCEPT',
+    cards:[
+      {id:'b12',title:'UNION',tag:'SET',tagClass:'qtag-set',
+       sql:hl(`SELECT name, dept FROM employees WHERE dept = 'Engineering'\nUNION\nSELECT name, dept FROM employees WHERE dept = 'HR';`),
+       glowKw:'UNION',
+       expAr:'UNION بيجمع نتايج query تانية تحت بعض — وبيشيل الصفوف المكررة.',
+       expEn:'UNION stacks result sets vertically and removes duplicates. Use UNION ALL to keep duplicates.',
+       pills:[
+         {key:'UNION',     keyColor:'green',  desc:'removes duplicates — slower'},
+         {key:'UNION ALL', keyColor:'yellow', desc:'keeps duplicates — faster'},
+         {key:'same # of columns', keyColor:'blue', desc:'both queries must match in column count & types'},
+       ]},
+      {id:'b13',title:'INTERSECT',tag:'SET',tagClass:'qtag-set',
+       sql:hl(`SELECT name FROM employees WHERE dept = 'Engineering'\nINTERSECT\nSELECT name FROM employees WHERE dept = 'HR';`),
+       glowKw:'INTERSECT',
+       expAr:'INTERSECT بيجيب بس الصفوف الموجودة في النتيجتين مع بعض.',
+       expEn:'INTERSECT returns only rows that appear in BOTH result sets.'},
+      {id:'b14',title:'EXCEPT',tag:'SET',tagClass:'qtag-set',
+       sql:hl(`SELECT name FROM employees WHERE dept = 'Engineering'\nEXCEPT\nSELECT name FROM employees WHERE dept = 'HR';`),
+       glowKw:'EXCEPT',
+       expAr:'EXCEPT بيجيب الصفوف اللي في النتيجة الأولى وموجودة في التانية.',
+       expEn:'EXCEPT returns rows from the first query that do not appear in the second.'},
+    ]
+  },
+  {
+    sectionLabel:'DISTINCT',
+    cards:[
+      {id:'b15',title:'DISTINCT',tag:'SELECT',tagClass:'qtag-select',
+       sql:hl(`SELECT DISTINCT dept\nFROM employees\nORDER BY dept;`),
+       glowKw:'DISTINCT',
+       expAr:'DISTINCT بتشيل الصفوف المكررة — بترجع كل قيمة مرة واحدة بس.',
+       expEn:'DISTINCT removes duplicate rows — returns each unique value only once.',
+       pills:[
+         {key:'DISTINCT',         keyColor:'green',  desc:'removes duplicate rows from result'},
+         {key:'SELECT DISTINCT *', keyColor:'yellow', desc:'whole row must be identical to be a duplicate'},
+         {key:'vs GROUP BY',      keyColor:'blue',   desc:'DISTINCT is simpler, GROUP BY lets you aggregate'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'NULL Handling',
+    cards:[
+      {id:'b16',title:'IS NULL / IS NOT NULL',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept\nFROM employees\nWHERE dept IS NULL;\n\nSELECT name, dept\nFROM employees\nWHERE dept IS NOT NULL;`),
+       glowKw:'NULL',
+       expAr:'NULL مش قيمة — مش ممكن تقارنه بـ = أو !=. لازم تستخدم IS NULL أو IS NOT NULL.',
+       expEn:'NULL is the absence of a value — you cannot compare it with = or !=, only IS NULL / IS NOT NULL.',
+       pills:[
+         {key:'IS NULL',     keyColor:'red',    desc:'matches rows where value is missing'},
+         {key:'IS NOT NULL', keyColor:'green',  desc:'matches rows where value exists'},
+         {key:'= NULL',      keyColor:'orange', desc:'WRONG — always returns false, never use this'},
+       ]},
+      {id:'b17',title:'COALESCE',tag:'SELECT',tagClass:'qtag-select',
+       sql:hl(`SELECT name,\n       dept,\n       COALESCE(dept, 'No Department') AS dept_display\nFROM employees;`),
+       glowKw:'COALESCE',
+       expAr:'COALESCE بترجع أول قيمة مش NULL من القايمة — مفيدة لما عايز تحط قيمة افتراضية بدل NULL.',
+       expEn:'COALESCE returns the first non-NULL value from its arguments — great for fallback/default values.',
+       pills:[
+         {key:'COALESCE(a, b, c)', keyColor:'green',  desc:'returns first non-NULL — left to right'},
+         {key:'COALESCE(col, 0)',  keyColor:'yellow', desc:'replace NULL with 0 — common pattern'},
+         {key:'COALESCE(col, \'N/A\')', keyColor:'blue', desc:'replace NULL with a string'},
+       ]},
+      {id:'b18',title:'NULLIF',tag:'SELECT',tagClass:'qtag-select',
+       sql:hl(`SELECT name, salary,\n       NULLIF(dept, 'HR') AS dept_nulled\nFROM employees;`),
+       glowKw:'NULLIF',
+       expAr:'NULLIF بترجع NULL لو القيمتين متساويين — عكس COALESCE، بتحول قيمة معينة لـ NULL.',
+       expEn:'NULLIF returns NULL if both arguments are equal — useful to treat a specific value as missing.',
+       pills:[
+         {key:'NULLIF(a, b)',   keyColor:'purple', desc:'returns NULL if a = b, else returns a'},
+         {key:'vs COALESCE',   keyColor:'blue',   desc:'COALESCE: NULL → value. NULLIF: value → NULL'},
+         {key:'division use',  keyColor:'orange', desc:'NULLIF(col, 0) prevents divide-by-zero errors'},
+       ]},
+      {id:'b19',title:'LOWER on WHERE — case-insensitive filter',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept\nFROM employees\nWHERE LOWER(name) LIKE '%omar%';`),
+       glowKw:'LOWER',
+       expAr:"LOWER على الـ WHERE بتخلي الفلتر مش case-sensitive — 'omar' هتلاقي Omar وOMar وOMAR.",
+       expEn:'Wrap the column in LOWER() to make LIKE comparisons case-insensitive.',
+       pills:[
+         {key:'LOWER(col) LIKE',  keyColor:'green',  desc:'case-insensitive search — standard SQL'},
+         {key:'ILIKE',            keyColor:'blue',   desc:'PostgreSQL shortcut — same as LOWER() LIKE'},
+       ]},
+    ]
+  },
+];
+
+const intermediateCards = [
+  {
+    sectionLabel:'GROUP BY / HAVING',
+    cards:[
+      {id:'m1',title:'GROUP BY',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT dept, COUNT(*) AS employee_count\nFROM employees\nGROUP BY dept\nORDER BY employee_count DESC;`),
+       glowKw:'GROUP',
+       expAr:'GROUP BY بتجمّع الصفوف اللي بيها نفس القيمة في عمود معين — زي لو عندك 10 موظفين في 4 أقسام، هتلاقي نفسك بترجع 4 صفوف بس، واحد لكل قسم.',
+       expEn:'GROUP BY collapses rows with the same value into groups for aggregate calculations.'},
+      {id:'m2',title:'SUM',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT dept, SUM(salary) AS total_salary\nFROM employees\nGROUP BY dept\nORDER BY total_salary DESC;`),
+       glowKw:'SUM',
+       expAr:'SUM بتجمع كل الأرقام في مجموعة — هنا بنحسب إجمالي الرواتب لكل قسم. الناتج عدد واحد لكل قسم.',
+       expEn:'SUM adds up all values in a group — here total salary spend per department.'},
+      {id:'m3',title:'HAVING',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT dept, AVG(salary) AS avg_salary\nFROM employees\nGROUP BY dept\nHAVING AVG(salary) > 7000\nORDER BY avg_salary DESC;`),
+       glowKw:'HAVING',
+       expAr:'HAVING زي WHERE بالظبط بس بتستخدمها بعد GROUP BY — لو حطيت WHERE مع AVG هيديك error لأن WHERE بتتنفذ قبل التجميع، بس HAVING بتتنفذ بعده.',
+       expEn:'HAVING filters groups after aggregation — WHERE filters rows before, HAVING filters groups after.',
+       pills:[
+         {key:'WHERE',  keyColor:'blue',   desc:'filters rows BEFORE grouping — can\'t use aggregates'},
+         {key:'HAVING', keyColor:'purple', desc:'filters groups AFTER grouping — can use aggregates'},
+         {key:'ORDER',  keyColor:'yellow', desc:'WHERE → GROUP BY → HAVING → ORDER BY'},
+       ]},
+      {id:'m4',title:'COUNT / AVG / MIN / MAX',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT dept,\n       COUNT(*) AS count,\n       AVG(salary) AS avg_salary,\n       MIN(salary) AS min_salary,\n       MAX(salary) AS max_salary\nFROM employees\nGROUP BY dept;`),
+       glowKw:'COUNT',
+       expAr:'ممكن تحط أكتر من دالة في نفس الـ SELECT — COUNT بيعد الصفوف، AVG بيحسب المتوسط، MIN وMAX بيجيبوا الأقل والأعلى، وكلهم بيتحسبوا لكل مجموعة على حدة.',
+       expEn:'You can use multiple aggregate functions in the same SELECT — they all operate per group.'},
+    ]
+  },
+  {
+    sectionLabel:'Subqueries',
+    cards:[
+      {id:'m5',title:'Subquery in WHERE',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT name, salary, dept\nFROM employees\nWHERE salary > (\n  SELECT AVG(salary) FROM employees\n)\nORDER BY salary DESC;`),
+       glowKw:'AVG',
+       expAr:'الـ Subquery بتتنفذ الأول وترجع قيمة واحدة (المتوسط) — بعدين الـ Query الخارجية بتستخدم القيمة دي كشرط. يعني الـ database بتعمل query جوه query.',
+       expEn:'A subquery runs first, its result is used by the outer query — here finding above-average salaries.',
+       pills:[
+         {key:'inner query runs first', keyColor:'purple', desc:'result passed to outer query'},
+         {key:'outer query runs second', keyColor:'blue',  desc:'uses inner result as a value'},
+         {key:'( SELECT ... )',          keyColor:'yellow', desc:'wrap subquery in parentheses always'},
+       ]},
+      {id:'m6',title:'Subquery — MAX salary',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT name, salary, dept\nFROM employees\nWHERE salary = (\n  SELECT MAX(salary) FROM employees\n);`),
+       glowKw:'MAX',
+       expAr:'الـ Subquery هنا بترجع رقم واحد بس وهو أعلى راتب — والـ Query الخارجية بتجيب الموظف اللي راتبه يساوي الرقم ده بالظبط.',
+       expEn:'The subquery finds the maximum salary, outer query finds the employee with that exact value.'},
+    ]
+  },
+  {
+    sectionLabel:'JOINs',
+    cards:[
+      {id:'m7',title:'INNER JOIN',tag:'JOIN',tagClass:'qtag-join',
+       sql:hl(`SELECT e.name, e.dept AS emp_dept,\n       d.dept_name, d.location\nFROM employees e\nINNER JOIN departments d\n  ON e.dept = d.dept_name;`),
+       glowKw:'INNER',
+       expAr:'INNER JOIN بيربط جدولين على أساس عمود مشترك — الموظفين اللي مش موجود قسمهم في جدول الأقسام مش بيظهروا خالص. لو عايز تشوفهم استخدم LEFT JOIN.',
+       expEn:'INNER JOIN returns only rows where the join condition matches in BOTH tables.',
+       pills:[
+         {key:'INNER JOIN', keyColor:'blue',   desc:'matched rows only — unmatched dropped'},
+         {key:'LEFT JOIN',  keyColor:'green',  desc:'all left rows + matched right (NULLs for unmatched)'},
+         {key:'RIGHT JOIN', keyColor:'purple', desc:'all right rows + matched left (NULLs for unmatched)'},
+         {key:'FULL JOIN',  keyColor:'orange', desc:'all rows from both — NULLs where no match'},
+       ]},
+      {id:'m8',title:'LEFT JOIN',tag:'JOIN',tagClass:'qtag-join',
+       sql:hl(`SELECT e.name, e.dept AS emp_dept,\n       d.dept_name, d.location\nFROM employees e\nLEFT JOIN departments d\n  ON e.dept = d.dept_name;`),
+       glowKw:'LEFT',
+       expAr:'LEFT JOIN بيحتفظ بكل صفوف الجدول الأول (employees) حتى لو مفيش تطابق في التاني — الأعمدة اللي مفيهاش بيانات بترجع NULL. مفيد لما تحب تعرف مين من جدول الأول مش موجود في التاني.',
+       expEn:'LEFT JOIN keeps all rows from the left table — unmatched right table columns become NULL.'},
+      {id:'m9',title:'RIGHT JOIN',tag:'JOIN',tagClass:'qtag-join',
+       sql:hl(`SELECT e.name, e.dept AS emp_dept,\n       d.dept_name, d.location\nFROM employees e\nRIGHT JOIN departments d\n  ON e.dept = d.dept_name;`),
+       glowKw:'RIGHT',
+       expAr:'RIGHT JOIN عكس LEFT — بيحتفظ بكل صفوف الجدول التاني (departments) حتى لو مفيش موظف في القسم ده. بتستخدمه لما يهمك الجدول الأيمن أكتر.',
+       expEn:'RIGHT JOIN keeps all rows from the right table — unmatched left table columns become NULL.'},
+    ]
+  },
+  {
+    sectionLabel:'String Functions',
+    cards:[
+      {id:'m10',title:'UPPER / LOWER / LENGTH / SUBSTRING',tag:'STRING',tagClass:'qtag-string',
+       sql:hl(`SELECT name,\n       UPPER(name)        AS upper_name,\n       LOWER(name)        AS lower_name,\n       LENGTH(name)       AS name_length,\n       SUBSTRING(name, 1, 5) AS first_5\nFROM employees;`),
+       glowKw:'UPPER',
+       expAr:'دوال النصوص بتتعامل مع الـ strings — UPPER بتحول كل الحروف كابيتال، LOWER صغير، LENGTH بتعد عدد الحروف، SUBSTRING بتسحب جزء من النص تحدد بداية ونهايته.',
+       expEn:'String functions transform text — UPPER/LOWER change case, LENGTH counts chars, SUBSTRING extracts a portion.'},
+    ]
+  },
+  {
+    sectionLabel:'Date Functions',
+    cards:[
+      {id:'m11',title:'EXTRACT / YEAR / AGE',tag:'DATE',tagClass:'qtag-date',
+       sql:hl(`SELECT name,\n       date_of_joining,\n       EXTRACT(YEAR FROM date_of_joining) AS join_year,\n       DATE_PART('year', AGE(CURRENT_DATE, date_of_joining)) AS years_in_company\nFROM employees\nORDER BY years_in_company DESC;`),
+       glowKw:'EXTRACT',
+       expAr:'EXTRACT بتسحب جزء معين من التاريخ زي السنة أو الشهر أو اليوم — مفيدة في التقارير السنوية والشهرية. AGE بتحسب الفرق بين تاريخين وبترجعه كـ interval.',
+       expEn:'EXTRACT pulls a component from a date — YEAR, MONTH, DAY, etc. AGE calculates elapsed time.'},
+    ]
+  },
+  {
+    sectionLabel:'CASE WHEN',
+    cards:[
+      {id:'m12',title:'CASE WHEN — salary_grade',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT name, salary,\n  CASE\n    WHEN salary < 7500  THEN 'Low'\n    WHEN salary < 10000 THEN 'Mid'\n    ELSE                     'Senior'\n  END AS salary_grade\nFROM employees\nORDER BY salary DESC;`),
+       glowKw:'CASE',
+       expAr:'CASE WHEN زي if/else في أي لغة برمجة — بتقيّم الشروط من فوق لتحت وبترجع أول شرط صح. لو مفيش شرط اتحقق بترجع قيمة الـ ELSE، ولو مفيش ELSE بترجع NULL.',
+       expEn:'CASE WHEN evaluates conditions in order and returns the first match — like if/else in code.',
+       pills:[
+         {key:'WHEN … THEN', keyColor:'purple', desc:'condition → value to return if true'},
+         {key:'ELSE',        keyColor:'blue',   desc:'fallback if no condition matched'},
+         {key:'END',         keyColor:'yellow', desc:'closes the CASE expression — required'},
+       ]},
+      {id:'m13',title:'CASE WHEN — dept_category',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT name, dept,\n  CASE dept\n    WHEN 'Engineering' THEN 'Technical'\n    WHEN 'Management'  THEN 'Leadership'\n    ELSE                    'Support'\n  END AS dept_category\nFROM employees\nORDER BY dept_category;`),
+       glowKw:'CASE',
+       expAr:'الشكل التاني من CASE بتحط القيمة بعد CASE مباشرة وبتعمل مقارنة على الـ WHEN — أنضف لما تكون بتقارن نفس العمود بقيم مختلفة.',
+       expEn:'Simple CASE compares one column against fixed values — cleaner than repeated WHEN col = x.',
+       pills:[
+         {key:'CASE col WHEN val', keyColor:'green',  desc:'shorthand — compares col = val each time'},
+         {key:'CASE WHEN expr',    keyColor:'purple', desc:'full form — any boolean expression allowed'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'EXISTS / NOT EXISTS',
+    cards:[
+      {id:'m14',title:'EXISTS',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT name, dept\nFROM employees e\nWHERE EXISTS (\n  SELECT 1\n  FROM departments d\n  WHERE d.dept_name = e.dept\n    AND d.location = 'Cairo'\n);`),
+       glowKw:'EXISTS',
+       expAr:'EXISTS بتشوف لو الـ subquery رجعت أي صفوف — مش بتهتم بالقيم، بس بوجود صفوف أو لأ. بتوقف بعد أول صف تلاقيه فعشان ده بيخليها أسرع من IN على جداول كبيرة.',
+       expEn:'EXISTS returns true if the subquery produces at least one row — it only checks existence, not values.',
+       pills:[
+         {key:'EXISTS',     keyColor:'green',  desc:'true if subquery returns ≥ 1 row'},
+         {key:'NOT EXISTS', keyColor:'red',    desc:'true if subquery returns 0 rows'},
+         {key:'SELECT 1',   keyColor:'blue',   desc:'convention — value doesn\'t matter, only row existence'},
+         {key:'vs IN',      keyColor:'yellow', desc:'EXISTS stops at first match — faster on large datasets'},
+       ]},
+      {id:'m15',title:'NOT EXISTS',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT dept_name\nFROM departments d\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM employees e\n  WHERE e.dept = d.dept_name\n);`),
+       glowKw:'EXISTS',
+       expAr:'NOT EXISTS بترجع الصفوف اللي مفيش ليها تطابق في الـ subquery — هنا بنجيب الأقسام اللي مفيهاش موظفين خالص.',
+       expEn:'NOT EXISTS finds rows in the outer query that have no matching rows in the subquery.'},
+    ]
+  },
+  {
+    sectionLabel:'String Functions — Extended',
+    cards:[
+      {id:'m16',title:'CONCAT / CONCAT_WS / TRIM / REPLACE',tag:'STRING',tagClass:'qtag-string',
+       sql:hl(`SELECT\n  name,\n  CONCAT(name, ' — ', dept)          AS full_label,\n  CONCAT_WS(' | ', name, dept)       AS piped,\n  TRIM('  Ahmed Ali  ')              AS trimmed,\n  REPLACE(dept, 'Engineering', 'Eng') AS short_dept\nFROM employees\nLIMIT 5;`),
+       glowKw:'CONCAT',
+       expAr:'CONCAT بتجمع نصوص مع بعض — لو أي قيمة NULL النتيجة كلها بتبقى NULL، عشان كده CONCAT_WS أأمن لأنه بيتجاهل الـ NULL. TRIM بتشيل المسافات الزيادة، REPLACE بتستبدل كل الـ occurrences.',
+       expEn:'CONCAT joins strings, CONCAT_WS adds a separator between them, TRIM removes whitespace, REPLACE substitutes text.',
+       pills:[
+         {key:'CONCAT(a, b)',       keyColor:'green',  desc:'joins strings — NULL anywhere = NULL result'},
+         {key:'CONCAT_WS(sep,a,b)', keyColor:'blue',   desc:'joins with separator — ignores NULLs'},
+         {key:'TRIM(col)',          keyColor:'yellow', desc:'removes leading and trailing spaces'},
+         {key:'REPLACE(col,a,b)',   keyColor:'purple', desc:'replaces every occurrence of a with b'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'Math Functions',
+    cards:[
+      {id:'m17',title:'ROUND / CEIL / FLOOR',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT\n  name, salary,\n  AVG(salary) OVER ()                    AS raw_avg,\n  ROUND(AVG(salary) OVER (), 2)          AS rounded,\n  CEIL(AVG(salary) OVER ())              AS ceiling,\n  FLOOR(AVG(salary) OVER ())             AS floor\nFROM employees\nLIMIT 5;`),
+       glowKw:'ROUND',
+       expAr:'ROUND بتقرّب على أقرب رقم — CEIL بتطلع للأعلى دايماً حتى لو 8.1 بترجع 9 — FLOOR بتنزل للأسفل دايماً حتى لو 8.9 بترجع 8.',
+       expEn:'ROUND rounds to nearest, CEIL always rounds up, FLOOR always rounds down.',
+       pills:[
+         {key:'ROUND(n, d)', keyColor:'green',  desc:'round to d decimal places'},
+         {key:'CEIL(n)',     keyColor:'blue',   desc:'always rounds UP — e.g. 8.1 → 9'},
+         {key:'FLOOR(n)',    keyColor:'purple', desc:'always rounds DOWN — e.g. 8.9 → 8'},
+       ]},
+      {id:'m18',title:'CAST',tag:'STRING',tagClass:'qtag-string',
+       sql:hl(`SELECT\n  name,\n  salary,\n  CAST(salary AS VARCHAR)    AS salary_text,\n  CAST('2024-01-01' AS DATE) AS converted_date,\n  salary::VARCHAR            AS pg_shorthand\nFROM employees\nLIMIT 5;`),
+       glowKw:'CAST',
+       expAr:'CAST بتحوّل نوع البيانات من نوع لتاني — في PostgreSQL في shorthand هو :: بيعمل نفس الكلام بس بطريقة أقصر وأوضح.',
+       expEn:'CAST converts a value from one data type to another — :: is the PostgreSQL shorthand syntax.',
+       pills:[
+         {key:'CAST(x AS type)', keyColor:'green',  desc:'standard SQL — works everywhere'},
+         {key:'x::type',         keyColor:'blue',   desc:'PostgreSQL shorthand — same result'},
+         {key:'common types',    keyColor:'yellow', desc:'INTEGER, VARCHAR, DATE, NUMERIC, BOOLEAN'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'Date Functions — Extended',
+    cards:[
+      {id:'m19',title:'DATE_TRUNC',tag:'DATE',tagClass:'qtag-date',
+       sql:hl(`SELECT\n  name,\n  date_of_joining,\n  DATE_TRUNC('month', date_of_joining) AS join_month,\n  DATE_TRUNC('year',  date_of_joining) AS join_year\nFROM employees\nORDER BY date_of_joining;`),
+       glowKw:'DATE_TRUNC',
+       expAr:'DATE_TRUNC بتقطع التاريخ لأول الوحدة اللي انت حددتها — لو قلت month هتاخد أول يوم في الشهر ده، لو قلت year هتاخد أول يناير.',
+       expEn:'DATE_TRUNC truncates a date to the start of a given unit — essential for monthly/yearly reporting.',
+       pills:[
+         {key:"'year'",    keyColor:'green',  desc:'2023-07-15 → 2023-01-01'},
+         {key:"'month'",   keyColor:'blue',   desc:'2023-07-15 → 2023-07-01'},
+         {key:"'day'",     keyColor:'yellow', desc:'2023-07-15 12:30 → 2023-07-15 00:00'},
+         {key:"'quarter'", keyColor:'purple', desc:'2023-07-15 → 2023-07-01 (start of Q3)'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'String Functions — POSITION / LEFT / RIGHT / LPAD / RPAD / REVERSE / SPLIT_PART',
+    cards:[
+      {id:'m20',title:'POSITION / LEFT / RIGHT / REVERSE',tag:'STRING',tagClass:'qtag-string',
+       sql:hl(`SELECT\n  name,\n  POSITION('a' IN LOWER(name))   AS pos_of_a,\n  LEFT(name, 5)                  AS first_5,\n  RIGHT(name, 5)                 AS last_5,\n  REVERSE(name)                  AS reversed\nFROM employees\nORDER BY name;`),
+       glowKw:'LEFT',
+       expAr:'POSITION بتجيب مكان أول حرف معين في النص (مش موجود بترجع 0) — LEFT بتجيب أول n حروف وهي أسرع من SUBSTRING في الكتابة — RIGHT بتجيب آخر n حروف — REVERSE بتعكس النص كامل.',
+       expEn:'POSITION finds where a substring starts, LEFT/RIGHT extract from either end, REVERSE flips the string.',
+       pills:[
+         {key:'POSITION(x IN col)', keyColor:'green',  desc:'returns index of first match — 0 if not found'},
+         {key:'LEFT(col, n)',        keyColor:'blue',   desc:'first n characters — cleaner than SUBSTRING(col,1,n)'},
+         {key:'RIGHT(col, n)',       keyColor:'purple', desc:'last n characters from the end'},
+         {key:'REVERSE(col)',        keyColor:'yellow', desc:'reverses the entire string'},
+       ]},
+      {id:'m21',title:'LPAD / RPAD / SPLIT_PART',tag:'STRING',tagClass:'qtag-string',
+       sql:hl(`SELECT\n  name,\n  LPAD(CAST(salary AS VARCHAR), 8, '0')  AS padded_salary,\n  RPAD(name, 20, '.')                    AS padded_name,\n  SPLIT_PART(name, ' ', 1)               AS first_name,\n  SPLIT_PART(name, ' ', 2)               AS last_name\nFROM employees\nORDER BY name;`),
+       glowKw:'SPLIT_PART',
+       expAr:'LPAD بتحشو مسافات أو حروف من الشمال عشان النص يوصل طول معين — مفيدة لما بتعمل reports وعايز أعمدة متساوية الطول. SPLIT_PART بتقسم النص على delimiter وترجع الجزء اللي انت عايزه برقمه.',
+       expEn:'LPAD/RPAD pad a string to a fixed length — SPLIT_PART splits by a delimiter and returns the nth piece.',
+       pills:[
+         {key:'LPAD(col, len, ch)', keyColor:'green',  desc:'pad left — e.g. 007 from 7'},
+         {key:'RPAD(col, len, ch)', keyColor:'blue',   desc:'pad right — e.g. "Ahmed....." '},
+         {key:'SPLIT_PART(col, delim, n)', keyColor:'purple', desc:'n=1 first part, n=2 second — great for emails, names'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'Math Functions — ABS / MOD / POWER / RANDOM',
+    cards:[
+      {id:'m22',title:'ABS / MOD / POWER / RANDOM',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT\n  name,\n  salary,\n  ABS(salary - 9000)            AS diff_from_9k,\n  MOD(id, 2)                    AS is_odd,\n  POWER(2, 10)                  AS two_to_ten,\n  ROUND(RANDOM()::NUMERIC, 4)   AS random_val\nFROM employees\nORDER BY id;`),
+       glowKw:'ABS',
+       expAr:'ABS بتشيل الإشارة السالبة وترجع القيمة المطلقة — MOD بترجع باقي القسمة وهي مفيدة لتحديد الأرقام الزوجية والفردية — POWER(2,10) يعني 2 مضروب في نفسه 10 مرات — RANDOM بترجع رقم عشوائي بين 0 و1 في كل مرة.',
+       expEn:'ABS removes sign, MOD gives remainder, POWER raises to exponent, RANDOM gives a random float 0–1.',
+       pills:[
+         {key:'ABS(n)',        keyColor:'green',  desc:'absolute value — removes negative sign'},
+         {key:'MOD(a, b)',     keyColor:'blue',   desc:'remainder — MOD(id,2)=0 means even row'},
+         {key:'POWER(b, exp)', keyColor:'purple', desc:'b raised to exp — POWER(2,10) = 1024'},
+         {key:'RANDOM()',      keyColor:'yellow', desc:'random float 0–1 — use with ORDER BY RANDOM() to shuffle'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'Aggregate — STRING_AGG / ARRAY_AGG / COUNT DISTINCT',
+    cards:[
+      {id:'m23',title:'STRING_AGG / ARRAY_AGG / COUNT DISTINCT',tag:'GROUP',tagClass:'qtag-group',
+       sql:hl(`SELECT\n  dept,\n  COUNT(*)                         AS total,\n  COUNT(DISTINCT age)              AS unique_ages,\n  STRING_AGG(name, ', ')           AS all_names,\n  STRING_AGG(name, ', '\n    ORDER BY salary DESC)           AS names_by_salary\nFROM employees\nGROUP BY dept\nORDER BY dept;`),
+       glowKw:'COUNT',
+       expAr:'STRING_AGG بتاخد كل قيم عمود في مجموعة وتحطهم في نص واحد مفصول بـ separator — زي لو عايز تكتب كل أسماء موظفي كل قسم في خانة واحدة. COUNT DISTINCT بيعد القيم الفريدة بس ويتجاهل التكرار.',
+       expEn:'STRING_AGG concatenates group values into one string, ARRAY_AGG collects them into an array, COUNT DISTINCT counts only unique values.',
+       pills:[
+         {key:'STRING_AGG(col, sep)',          keyColor:'green',  desc:'joins all values with separator — e.g. "Ahmed, Sara, Omar"'},
+         {key:'STRING_AGG(col, sep ORDER BY)', keyColor:'blue',   desc:'control the order of concatenation'},
+         {key:'ARRAY_AGG(col)',                keyColor:'purple', desc:'returns a PostgreSQL array — {Ahmed,Sara,Omar}'},
+         {key:'COUNT(DISTINCT col)',           keyColor:'yellow', desc:'counts only unique values — ignores duplicates'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'Regex — Pattern Matching',
+    cards:[
+      {id:'m24',title:'Regex Reference + 10 Queries',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content, category\nFROM messages\nWHERE content ~ '^[A-Z]';`),
+       glowKw:'WHERE',
+       expAr:'Regex في PostgreSQL بتستخدم ~ للمطابقة — بتقدر تدوّر على أي نمط في النص زي الأرقام أو الإيميلات أو الكلمات المعينة.',
+       expEn:'Regex in PostgreSQL uses ~ to match patterns — far more powerful than LIKE for complex text filtering.',
+       regexTable:[
+         {pat:'^',         meaning:'Start of string',         example:'<span class="match">\'Meeting at 10am\'</span> ~ <span class="match">\'^\'^M\'</span> → ✓'},
+         {pat:'$',         meaning:'End of string',           example:'<span class="match">\'10am sharp\'</span> ~ <span class="match">\'p$\'</span> → ✓'},
+         {pat:'\\d',       meaning:'Any digit 0–9',           example:'<span class="match">\'Call 01012\'</span> ~ <span class="match">\'\\d\'</span> → ✓'},
+         {pat:'\\d+',      meaning:'One or more digits',      example:'<span class="match">\'$5000 approved\'</span> ~ <span class="match">\'\\d+\'</span> → ✓'},
+         {pat:'\\w',       meaning:'Letter, digit or _',      example:'<span class="match">\'Ahmed_1\'</span> ~ <span class="match">\'\\w\'</span> → ✓'},
+         {pat:'[A-Z]',     meaning:'Any uppercase letter',    example:'<span class="match">\'ERROR\'</span> ~ <span class="match">\'[A-Z]\'</span> → ✓'},
+         {pat:'[a-z]',     meaning:'Any lowercase letter',    example:'<span class="match">\'meeting\'</span> ~ <span class="match">\'[a-z]\'</span> → ✓'},
+         {pat:'[^abc]',    meaning:'NOT any of these chars',  example:'<span class="match">\'xyz\'</span> ~ <span class="match">\'[^abc]\'</span> → ✓'},
+         {pat:'{2,}',      meaning:'2 or more repetitions',   example:'<span class="match">\'DONE\'</span> ~ <span class="match">\'[A-Z]{2,}\'</span> → ✓'},
+         {pat:'a|b',       meaning:'a OR b',                  example:'<span class="match">\'ERROR\'</span> ~* <span class="match">\'error|warning\'</span> → ✓'},
+         {pat:'~',  op:true, meaning:'Case-sensitive match',  example:'content ~ <span class="match">\'\\d\'</span>'},
+         {pat:'~*', op:true, meaning:'Case-insensitive match',example:'content ~* <span class="match">\'error\'</span>'},
+         {pat:'!~', op:true, meaning:'Does NOT match',        example:'content !~ <span class="match">\'\\d\'</span>'},
+       ],
+       pills:[
+         {key:'~',   keyColor:'green',  desc:'case-sensitive regex match'},
+         {key:'~*',  keyColor:'blue',   desc:'case-insensitive regex match'},
+         {key:'!~',  keyColor:'red',    desc:'does NOT match — negation'},
+         {key:'!~*', keyColor:'orange', desc:'does NOT match — case-insensitive'},
+       ]},
+      {id:'m25',title:'Q1 — Starts with uppercase',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~ '^[A-Z]';`),
+       glowKw:'WHERE',
+       expAr:'^ معناها أول الكلمة — [A-Z] معناها أي حرف كابيتال — يعني بنجيب الرسايل اللي بتبدأ بحرف كبير.',
+       expEn:'^ anchors to the start of string — [A-Z] matches any uppercase — finds messages starting with a capital letter.'},
+      {id:'m26',title:'Q2 — Contains any number',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~ '\\d+';`),
+       glowKw:'WHERE',
+       expAr:'\\d معناها أي رقم من 0 لـ 9 — \\d+ معناها رقم أو أكتر — بنجيب كل الرسايل اللي فيها أي رقم.',
+       expEn:'\\d matches any digit — \\d+ means one or more digits — finds any message containing a number.'},
+      {id:'m27',title:'Q3 — Dollar amount',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~ '\\$[0-9]+';`),
+       glowKw:'WHERE',
+       expAr:'\\$ معناها الرمز $ نفسه (لازم تعمل escape) — [0-9]+ معناها أرقام بعده — بنلاقي الرسايل اللي فيها مبالغ مالية.',
+       expEn:'\\$ escapes the special $ character — [0-9]+ matches the digits after — finds messages with a dollar amount.'},
+      {id:'m28',title:'Q4 — System alerts (case-insensitive OR)',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content, category\nFROM messages\nWHERE content ~* 'error|warning';`),
+       glowKw:'WHERE',
+       expAr:'~* معناها مش case-sensitive — | معناها OR — يعني بنجيب الرسايل اللي فيها error أو WARNING أو Error بأي شكل.',
+       expEn:'~* makes the match case-insensitive — | means OR — catches ERROR, error, Warning, warning all at once.'},
+      {id:'m29',title:'Q5 — Email detection',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~ '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+';`),
+       glowKw:'WHERE',
+       expAr:'ده pattern الإيميل الكامل — لازم يكون فيه @ في النص — [a-zA-Z0-9._%+-]+ قبل الـ @ وبعده اسم الدومين.',
+       expEn:'The @ is required in the middle — characters before it match the local part, after it matches the domain.'},
+      {id:'m30',title:'Q6 — ALL CAPS word',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~ '[A-Z]{2,}';`),
+       glowKw:'WHERE',
+       expAr:'{2,} معناها حرفين كبار أو أكتر متجاورين — بنلاقي الرسايل اللي فيها كلمة كابيتال زي ERROR أو DONE.',
+       expEn:'{2,} means 2 or more consecutive uppercase letters — catches words like ERROR, DONE, WARNING.'},
+      {id:'m31',title:'Q7 — No digits at all',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content !~ '\\d';`),
+       glowKw:'WHERE',
+       expAr:'!~ معناها مش بيتطابق — يعني بنجيب الرسايل اللي مفيهاش أي رقم خالص.',
+       expEn:'!~ is the negation operator — returns rows where the pattern does NOT match — no digits at all.'},
+      {id:'m32',title:'Q8 — Ends with punctuation',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~ '[!?.]$';`),
+       glowKw:'WHERE',
+       expAr:'$ معناها آخر النص — [!?.] معناها أي علامة من دول — بنجيب الرسايل اللي بتخلص بعلامة تعجب أو استفهام أو نقطة.',
+       expEn:'$ anchors to end of string — [!?.] matches any of those punctuation marks — finds messages ending with punctuation.'},
+      {id:'m33',title:'Q9 — Date pattern YYYY-MM-DD',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~ '\\d{4}-\\d{2}-\\d{2}';`),
+       glowKw:'WHERE',
+       expAr:'\\d{4} معناها 4 أرقام بالظبط — \\d{2} معناها رقمين — ده pattern التاريخ بالصيغة YYYY-MM-DD.',
+       expEn:'\\d{4} means exactly 4 digits — \\d{2} means exactly 2 — together they match the YYYY-MM-DD date format.'},
+      {id:'m34',title:'Q10 — Extract full email (@ required)',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content,\n  SUBSTRING(content FROM '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}') AS extracted_email\nFROM messages\nWHERE content ~ '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}';`),
+       glowKw:'WHERE',
+       expAr:'SUBSTRING مع FROM بتسحب الـ pattern من جوه النص — مش بس بتفلتر، بتجيب الإيميل نفسه من الجملة. @ شرط أساسي في الـ pattern.',
+       expEn:'SUBSTRING ... FROM extracts the matched pattern from the string — pulls the actual email out. @ is mandatory in the pattern.'},
+    ]
+  },
+  {
+    sectionLabel:'Regex Operators Deep Dive — ~* / !~ / !~*',
+    cards:[
+      {id:'m35',title:'~* — Case-insensitive: what does it mean?',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content ~* 'done';`),
+       glowKw:'WHERE',
+       expAr:`Case-sensitive يعني الـ database بتفرق بين الحروف الكبيرة والصغيرة — 'done' مش زي 'DONE' مش زي 'Done'.
+
+لما بتستخدم ~ (بدون *) بتبحث بالظبط زي ما كتبت — 'done' بتلاقي done بس.
+
+لما بتستخدم ~* (مع *) بتبحث بغض النظر عن الـ case — 'done' بتلاقي done وDONE وDone وdOnE وأي تركيبة.
+
+Use case: لما مش عارف المستخدم كتب الكلمة بإيه طريقة — زي search box أو بيانات جاية من مصادر مختلفة.`,
+       expEn:'Case-insensitive means the letter case is ignored — done, DONE, Done all match. ~* is the case-insensitive version of ~. Essential when data comes from user input.',
+       pills:[
+         {key:'~',  keyColor:'purple', desc:"'done' matches 'done' only — case matters"},
+         {key:'~*', keyColor:'green',  desc:"'done' matches 'done','DONE','Done' — case ignored"},
+         {key:'use case', keyColor:'blue', desc:'user input, mixed-case data, search features'},
+       ]},
+      {id:'m36',title:'~* — Case-insensitive: find any category keyword',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content, category\nFROM messages\nWHERE content ~* 'budget|price|approved';`),
+       glowKw:'WHERE',
+       expAr:`بنبحث عن كلمات مالية في الرسايل بغض النظر عن الـ case — لو حد كتب BUDGET أو Budget أو budget كلها هتتلاقى.
+
+ده مهم جداً في الـ real world لأن البيانات مش دايماً بتيجي بنفس الـ format — خصوصاً لو الـ data جاية من emails أو messages أو user input.
+
+الـ | هنا بتعمل OR يعني أي كلمة من دول تلاقيها.`,
+       expEn:'Searching for financial keywords regardless of how they were typed — critical in real systems where data comes from multiple sources with inconsistent casing.'},
+      {id:'m37',title:'!~ — Does NOT match: what does it mean?',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content !~ '\\$|\\d{5,}';`),
+       glowKw:'WHERE',
+       expAr:`!~ هي عكس ~ تماماً — بتجيب الصفوف اللي الـ pattern مش موجود فيها.
+
+زي NOT LIKE بس أقوى — استخدمها لما تحب تستبعد نوع معين من البيانات.
+
+هنا بنجيب الرسايل اللي مفيهاش علامة دولار ولا أرقام طويلة (5 أرقام أو أكتر) — يعني بنستبعد الرسايل المالية.
+
+Use case: فلترة spam، استبعاد بيانات معينة، تنظيف data.`,
+       expEn:'!~ is the negation — returns rows where the pattern is NOT found. Use it to exclude rows matching a pattern, like filtering out spam or financial messages.',
+       pills:[
+         {key:'!~',  keyColor:'red',    desc:'returns rows where pattern is NOT found'},
+         {key:'~ vs !~', keyColor:'yellow', desc:'~ includes matches — !~ excludes them'},
+         {key:'use case', keyColor:'blue', desc:'spam filtering, data cleaning, exclusion rules'},
+       ]},
+      {id:'m38',title:'!~ — Does NOT match: exclude system messages',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content, category\nFROM messages\nWHERE content !~ '^(ERROR|WARNING)'\n  AND category !~ 'system';`),
+       glowKw:'WHERE',
+       expAr:`بنستبعد كل الرسايل اللي بتبدأ بـ ERROR أو WARNING وكمان بنستبعد category اللي اسمها system.
+
+لاحظ إن !~ case-sensitive — يعني 'error' بالصغير مش هيتأثر. لو عايز تستبعد بغض النظر عن الـ case استخدم !~*.
+
+AND هنا معناها الاتنين لازم يتحققوا — يعني مش system ومش بتبدأ بـ ERROR/WARNING.`,
+       expEn:'Combining two !~ conditions with AND to exclude both system alert messages and the system category. Note: !~ is case-sensitive — ERROR is excluded but error is not.'},
+      {id:'m39',title:'!~* — Does NOT match (case-insensitive): what does it mean?',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content\nFROM messages\nWHERE content !~* 'error|warning|failed';`),
+       glowKw:'WHERE',
+       expAr:`!~* هي الجمع بين الاتنين — مش بيتطابق + case-insensitive.
+
+يعني بتستبعد الصفوف اللي فيها الـ pattern بأي شكل كان — ERROR أو error أو Error كلها بتتاستبعد.
+
+الفرق بين !~ و!~*:
+!~ : بتستبعد 'error' بس — 'ERROR' مش بتتأثر
+!~*: بتستبعد error وERROR وError وأي تركيبة
+
+Use case: لما عايز تستبعد كلمة معينة بغض النظر عن إزاي اتكتبت.`,
+       expEn:'!~* combines negation and case-insensitivity — excludes rows containing the pattern in any case. The safest exclusion operator when you cannot predict the casing of your data.',
+       pills:[
+         {key:'!~*', keyColor:'red',    desc:'NOT match + case-insensitive — strongest exclusion'},
+         {key:'!~',  keyColor:'orange', desc:'NOT match + case-sensitive — only excludes exact case'},
+         {key:'~*',  keyColor:'green',  desc:'match + case-insensitive — includes any case'},
+         {key:'~',   keyColor:'purple', desc:'match + case-sensitive — includes exact case only'},
+       ]},
+      {id:'m40',title:'!~* — Exclude finance messages (any case)',tag:'FILTER',tagClass:'qtag-filter',
+       sql:hl(`SELECT sender, content, category\nFROM messages\nWHERE content !~* 'budget|price|\\$|approved'\n  AND category !~* 'finance';`),
+       glowKw:'WHERE',
+       expAr:`بنستبعد كل الرسايل المالية بغض النظر عن الـ case — BUDGET أو budget أو Budget كلها بتتاستبعد.
+
+ده أكتر أماناً من !~ لأنك مش محتاج تفكر في إيه الـ case اللي البيانات بيها.
+
+ملخص الأربع operators:
+~ → بحث حساس للـ case
+~* → بحث غير حساس للـ case  
+!~ → استبعاد حساس للـ case
+!~* → استبعاد غير حساس للـ case`,
+       expEn:'Using !~* to safely exclude financial content regardless of case — the most defensive approach when data consistency cannot be guaranteed.',
+       pills:[
+         {key:'All 4 operators', keyColor:'blue', desc:'~  ~*  !~  !~* — match/exclude × case-sensitive/insensitive'},
+       ]},
+    ]
+  },
+];
+
+/* ══════════════════════════════════════════
+   BUILD ADVANCED CARDS
+══════════════════════════════════════════ */
+const advancedCards = [
+  {
+    sectionLabel:'ROW_NUMBER / RANK / DENSE_RANK',
+    cards:[
+      {id:'a1',title:'ROW_NUMBER',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`SELECT\n  ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_number,\n  name,\n  salary,\n  dept\nFROM employees;`),
+       glowKw:'ROW_NUMBER',
+       expAr:'ROW_NUMBER بتديلك رقم تسلسلي فريد لكل صف — لو في موظفين براتب واحد، كل واحد هياخد رقم مختلف مش هيتشاركوا. الأرقام مش بتتكرر أبداً.',
+       expEn:'ROW_NUMBER assigns a unique sequential number to each row — ties get different numbers.'},
+      {id:'a2',title:'RANK',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`SELECT\n  RANK() OVER (ORDER BY salary DESC) AS rank,\n  name,\n  salary\nFROM employees;`),
+       glowKw:'RANK',
+       expAr:'RANK بتديلك رانك بس لو في تساوي، الاتنين بياخدوا نفس الرقم وبعدين في فجوة — زي لو في شخصين في المركز 2 هيبقى الجاي رقم 4 مش 3.',
+       expEn:'RANK gives the same rank to ties but skips the next rank — e.g. 1, 2, 2, 4 (no 3).',
+       pills:[
+         {key:'ROW_NUMBER', keyColor:'blue',   desc:'1, 2, 3, 4 — always unique, no ties'},
+         {key:'RANK',       keyColor:'yellow', desc:'1, 2, 2, 4 — ties same rank, then gap'},
+         {key:'DENSE_RANK', keyColor:'green',  desc:'1, 2, 2, 3 — ties same rank, no gap'},
+       ]},
+      {id:'a3',title:'DENSE_RANK',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`SELECT\n  DENSE_RANK() OVER (ORDER BY salary DESC) AS dense_rank,\n  name,\n  salary\nFROM employees;`),
+       glowKw:'DENSE_RANK',
+       expAr:'DENSE_RANK زي RANK بالظبط في التساوي بس من غير فجوة — لو في شخصين في المركز 2 الجاي هيبقى 3 مش 4. استخدمها لما الفجوات مش مهمة.',
+       expEn:'DENSE_RANK gives same rank to ties but does NOT skip — e.g. 1, 2, 2, 3 (no gap).'},
+      {id:'a4',title:'RANK with PARTITION BY',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`SELECT\n  RANK() OVER (PARTITION BY dept ORDER BY salary DESC) AS dept_rank,\n  name,\n  dept,\n  salary\nFROM employees\nORDER BY dept, dept_rank;`),
+       glowKw:'PARTITION',
+       expAr:'PARTITION BY زي GROUP BY بالظبط في التقسيم بس الفرق الجوهري إن الصفوف مش بتتطوى — كل صف بيفضل موجود وعنده رانكه الخاص جوه قسمه.',
+       expEn:'PARTITION BY resets the window function per group — like GROUP BY but without collapsing rows.',
+       pills:[
+         {key:'PARTITION BY', keyColor:'purple', desc:'resets window per group — rows stay intact'},
+         {key:'GROUP BY',     keyColor:'red',    desc:'collapses rows into 1 per group — rows disappear'},
+         {key:'no PARTITION', keyColor:'blue',   desc:'whole table treated as one window'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'LEAD / LAG',
+    cards:[
+      {id:'a5',title:'LEAD',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`SELECT\n  name,\n  salary,\n  LEAD(salary, 1) OVER (ORDER BY id) AS next_salary\nFROM employees\nORDER BY id;`),
+       glowKw:'LEAD',
+       expAr:'LEAD بتجيبلك قيمة الصف اللي بعدك في الترتيب — مفيدة لما تحب تقارن كل صف بيه اللي جاي بعده. آخر صف في النتيجة مش عنده تالي فبترجع NULL.',
+       expEn:'LEAD looks ahead — returns the value from the next row. Last row gets NULL.',
+       pills:[
+         {key:'LEAD(col, n)',  keyColor:'green',  desc:'value n rows AHEAD — looks forward'},
+         {key:'LAG(col, n)',   keyColor:'purple', desc:'value n rows BEHIND — looks backward'},
+         {key:'boundary row', keyColor:'red',    desc:'returns NULL — no next/prev row exists'},
+       ]},
+      {id:'a6',title:'LAG',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`SELECT\n  name,\n  salary,\n  LAG(salary, 1) OVER (ORDER BY id) AS prev_salary\nFROM employees\nORDER BY id;`),
+       glowKw:'LAG',
+       expAr:'LAG عكس LEAD — بتجيبلك قيمة الصف اللي فات — مفيدة لحساب الفرق بين صف وسابقه زي فرق الراتب من شهر لشهر. أول صف في النتيجة مش عنده سابق فبترجع NULL.',
+       expEn:'LAG looks behind — returns the value from the previous row. First row gets NULL.'},
+    ]
+  },
+  {
+    sectionLabel:'Window Frames — ROWS BETWEEN / RANGE BETWEEN',
+    cards:[
+      {id:'a7',title:'Comprehensive Frame Example',tag:'FRAME',tagClass:'qtag-frame',
+       sql:hl(
+`SELECT
+  name,
+  salary,
+
+  SUM(salary) OVER (
+    ORDER BY id
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS running_sum,
+
+  SUM(salary) OVER (
+    ORDER BY id
+    ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
+  ) AS reverse_sum,
+
+  SUM(salary) OVER (
+    ORDER BY id
+    ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
+  ) AS prev_window_sum,
+
+  SUM(salary) OVER (
+    ORDER BY id
+    ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING
+  ) AS next_window_sum,
+
+  SUM(salary) OVER (
+    ORDER BY id
+    ROWS BETWEEN CURRENT ROW AND CURRENT ROW
+  ) AS current_only,
+
+  SUM(salary) OVER (
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS full_sum,
+
+  SUM(salary) OVER (
+    ORDER BY id
+    ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
+  ) AS rows_window_sum
+
+FROM employees
+ORDER BY id;`),
+       glowKw:'ROWS',
+       expAr:'كل نوع Frame بيحدد أنهي صفوف تدخل في حساب الـ Window Function — ROWS بيعد الصفوف الفعلية، RANGE بيشمل كل الصفوف اللي بنفس القيمة.',
+       expEn:'Frame clauses define which rows are included in the window calculation relative to the current row.',
+       framePills:[
+         {key:'UNBOUNDED PRECEDING', keyColor:'green',  desc:'Start from first row — من أول الجدول'},
+         {key:'UNBOUNDED FOLLOWING', keyColor:'green',  desc:'End at last row — لآخر الجدول'},
+         {key:'CURRENT ROW',         keyColor:'blue',   desc:'The current row only — الصف الحالي بس'},
+         {key:'n PRECEDING',         keyColor:'purple', desc:'n rows before current — n صفوف قبل الحالي'},
+         {key:'n FOLLOWING',         keyColor:'purple', desc:'n rows after current — n صفوف بعد الحالي'},
+         {key:'ROWS',                keyColor:'yellow', desc:'counts physical rows — ties get DIFFERENT frames'},
+         {key:'RANGE',               keyColor:'orange', desc:'includes all rows with same ORDER BY value — ties share SAME frame'},
+         {key:'default frame',       keyColor:'red',    desc:'when ORDER BY used: RANGE UNBOUNDED PRECEDING → CURRENT ROW'},
+       ]
+      },
+    ]
+  },
+  {
+    sectionLabel:'CTE — WITH clause',
+    cards:[
+      {id:'a8',title:'CTE — Single WITH',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`WITH high_earners AS (
+  SELECT name, salary, dept
+  FROM employees
+  WHERE salary > 9000
+)
+SELECT *
+FROM high_earners
+ORDER BY salary DESC;`),
+       glowKw:'WITH',
+       expAr:'CTE هي query بتديها اسم وبتستخدمها بعدين زي جدول — بدل ما تحشر subquery كبيرة جوه query تانية، بتكتبها بره بشكل واضح وبتشير ليها باسمها. الكود بيبقى أوضح وأسهل في الفهم.',
+       expEn:'A CTE (Common Table Expression) is a named temporary result set defined with WITH — makes complex queries readable by breaking them into named steps.',
+       pills:[
+         {key:'WITH name AS (...)', keyColor:'green',  desc:'defines the CTE — runs first'},
+         {key:'SELECT FROM name',   keyColor:'blue',   desc:'reference the CTE like a regular table'},
+         {key:'temporary',          keyColor:'yellow', desc:'only exists for the duration of the query'},
+         {key:'vs subquery',        keyColor:'purple', desc:'CTE is named & reusable — subquery is inline & anonymous'},
+       ]},
+      {id:'a9',title:'CTE — Two CTEs chained',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`WITH dept_avg AS (
+  SELECT dept,
+         AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY dept
+),
+above_avg AS (
+  SELECT e.name, e.salary, e.dept,
+         da.avg_salary,
+         e.salary - da.avg_salary AS diff_from_avg
+  FROM employees e
+  JOIN dept_avg da ON e.dept = da.dept
+  WHERE e.salary > da.avg_salary
+)
+SELECT *
+FROM above_avg
+ORDER BY diff_from_avg DESC;`),
+       glowKw:'WITH',
+       expAr:'لما تعرّف أكتر من CTE، كل واحدة ممكن تستخدم اللي قبلها — ده زي ما بتبني pipeline من خطوات: الأولى بتحسب المتوسطات، التانية بتاخد الناتج وتفلتره. بتفصلهم بفاصلة واحدة.',
+       expEn:'Multiple CTEs are separated by commas. Each CTE can reference previous CTEs — think of it as building a pipeline of named steps.',
+       pills:[
+         {key:'CTE 1 → CTE 2',       keyColor:'green',  desc:'second CTE can query the first'},
+         {key:', (comma)',            keyColor:'yellow', desc:'separates multiple CTEs — only one WITH keyword'},
+         {key:'readability',          keyColor:'blue',   desc:'replace deeply nested subqueries with readable named steps'},
+         {key:'execution order',      keyColor:'purple', desc:'CTEs defined top to bottom — each can use those above it'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'FIRST_VALUE / LAST_VALUE / NTILE / PERCENT_RANK',
+    cards:[
+      {id:'a10',title:'FIRST_VALUE / LAST_VALUE',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`SELECT
+  name, dept, salary,
+  FIRST_VALUE(salary) OVER (
+    PARTITION BY dept ORDER BY salary DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS dept_max_salary,
+  LAST_VALUE(salary) OVER (
+    PARTITION BY dept ORDER BY salary DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS dept_min_salary
+FROM employees
+ORDER BY dept, salary DESC;`),
+       glowKw:'FIRST_VALUE',
+       expAr:'FIRST_VALUE بتجيب أول قيمة في الـ window — LAST_VALUE بتجيب آخر قيمة بس تنبّه: لازم تحدد ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING أو هتاخد قيمة الصف الحالي بس مش آخر قيمة.',
+       expEn:'FIRST_VALUE gets the first value in the window frame, LAST_VALUE gets the last. Always use UNBOUNDED FOLLOWING with LAST_VALUE or the frame defaults to current row.',
+       pills:[
+         {key:'FIRST_VALUE(col)', keyColor:'green',  desc:'first value in the window — by ORDER BY'},
+         {key:'LAST_VALUE(col)',  keyColor:'blue',   desc:'last value — needs UNBOUNDED FOLLOWING to work correctly'},
+         {key:'frame required',   keyColor:'red',    desc:'always add ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING for LAST_VALUE'},
+       ]},
+      {id:'a11',title:'NTILE',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`SELECT
+  name, salary,
+  NTILE(4) OVER (ORDER BY salary DESC) AS quartile,
+  NTILE(3) OVER (ORDER BY salary DESC) AS tercile
+FROM employees
+ORDER BY salary DESC;`),
+       glowKw:'NTILE',
+       expAr:'NTILE بتقسم الصفوف لمجموعات متساوية — NTILE(4) يعني ربع الصفوف الأعلى في bucket 1، التاني في 2، وهكذا. مفيدة في تحليل الأداء وتقسيم العملاء لفئات.',
+       expEn:'NTILE(n) divides rows into n equal-sized buckets ordered by the window ORDER BY — useful for percentile analysis.',
+       pills:[
+         {key:'NTILE(4)', keyColor:'green',  desc:'splits into 4 quartiles — Q1, Q2, Q3, Q4'},
+         {key:'NTILE(10)', keyColor:'blue',  desc:'splits into deciles — common in analytics'},
+         {key:'bucket 1',  keyColor:'yellow',desc:'always the TOP bucket when ORDER BY DESC'},
+       ]},
+      {id:'a12',title:'PERCENT_RANK',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`SELECT
+  name, salary,
+  ROUND(PERCENT_RANK() OVER (ORDER BY salary)::NUMERIC, 3) AS pct_rank,
+  ROUND(PERCENT_RANK() OVER (ORDER BY salary) * 100, 1)    AS percentile
+FROM employees
+ORDER BY salary DESC;`),
+       glowKw:'PERCENT_RANK',
+       expAr:'PERCENT_RANK بترجع رقم بين 0 و1 يمثل ترتيب الصف بالنسبة للباقين — 0 يعني الأقل، 1 يعني الأعلى. لو ضربته في 100 يبقى الـ percentile الحقيقي.',
+       expEn:'PERCENT_RANK returns a value between 0 and 1 representing the relative rank — 0 for lowest, 1 for highest.',
+       pills:[
+         {key:'range 0 → 1',  keyColor:'green',  desc:'0 = lowest rank, 1 = highest rank'},
+         {key:'× 100',        keyColor:'blue',   desc:'multiply by 100 to get a percentile score'},
+         {key:'formula',      keyColor:'yellow', desc:'(rank - 1) / (total rows - 1)'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'FILTER — Conditional Aggregation',
+    cards:[
+      {id:'a13',title:'FILTER (WHERE ...)',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`SELECT
+  dept,
+  COUNT(*)                                    AS total,
+  COUNT(*) FILTER (WHERE salary > 9000)       AS high_earners,
+  COUNT(*) FILTER (WHERE salary <= 9000)      AS normal_earners,
+  AVG(salary) FILTER (WHERE age > 30)         AS avg_salary_over30
+FROM employees
+GROUP BY dept
+ORDER BY dept;`),
+       glowKw:'FILTER',
+       expAr:'FILTER بتخلي الـ aggregate يشتغل على جزء من البيانات بس — بدل ما تكتب CASE WHEN جوه الـ SUM اللي بيكون معقد، بتكتب FILTER(WHERE ...) بعدها مباشرة وبيبقى أوضح وأسرع.',
+       expEn:'FILTER applies a condition to an aggregate — only rows matching the filter are included in the calculation.',
+       pills:[
+         {key:'AGG() FILTER (WHERE cond)', keyColor:'green',  desc:'aggregate only rows where cond is true'},
+         {key:'vs CASE WHEN',              keyColor:'blue',   desc:'cleaner syntax — both produce same result'},
+         {key:'multiple filters',          keyColor:'yellow', desc:'use many FILTER clauses in one SELECT'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'EXPLAIN / EXPLAIN ANALYZE',
+    cards:[
+      {id:'a15',title:'EXPLAIN — Query Plan',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`EXPLAIN\nSELECT name, salary\nFROM employees\nWHERE dept = 'Engineering'\nORDER BY salary DESC;`),
+       glowKw:'WITH',
+       expAr:'EXPLAIN بتريك خطة التنفيذ اللي PostgreSQL هتستخدمها — من غير ما تنفذ الـ query فعلاً. مفيدة تعرف الـ database هتعمل إيه قبل ما تشغّل.',
+       expEn:'EXPLAIN shows the execution plan PostgreSQL will use — without actually running the query. Use it to understand how your query will be executed.',
+       note:{
+         ar:`📌 مثال على output حقيقي لـ EXPLAIN:\n\nSort (cost=45.23..46.48 rows=500 width=36)\n  Sort Key: salary DESC\n  -> Seq Scan on employees\n       (cost=0.00..21.00 rows=500 width=36)\n       Filter: (dept = 'Engineering')`,
+         en:`cost=start..total — start cost before first row, total cost for all rows. rows= estimated row count. width= average row size in bytes.`
+       },
+       pills:[
+         {key:'Seq Scan',   keyColor:'red',    desc:'reads whole table — no index used'},
+         {key:'Index Scan', keyColor:'green',  desc:'uses an index — much faster on large tables'},
+         {key:'cost=a..b',  keyColor:'yellow', desc:'a=startup cost, b=total cost — lower is better'},
+         {key:'rows=n',     keyColor:'blue',   desc:'estimated number of rows returned'},
+         {key:'width=n',    keyColor:'purple', desc:'average row size in bytes'},
+       ]},
+      {id:'a16',title:'EXPLAIN ANALYZE — Real Execution',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(`EXPLAIN ANALYZE\nSELECT dept, AVG(salary)\nFROM employees\nGROUP BY dept\nORDER BY AVG(salary) DESC;`),
+       glowKw:'WITH',
+       expAr:'EXPLAIN ANALYZE بتنفذ الـ query فعلاً وبترجع الوقت الحقيقي — مش تقدير. بتقارن بين الـ estimated والـ actual عشان تعرف فين المشكلة.',
+       expEn:'EXPLAIN ANALYZE actually runs the query and returns real timing — not estimates. Compare estimated vs actual rows to spot performance issues.',
+       note:{
+         ar:`📌 مثال على output حقيقي لـ EXPLAIN ANALYZE:\n\nSort (cost=45.23..46.48 rows=500 width=36)\n       (actual time=2.341..2.345 rows=4 loops=1)\n  Sort Key: avg DESC\n  -> HashAggregate (cost=21.00..26.00 rows=4)\n             (actual time=1.203..1.215 rows=4 loops=1)\n       Group Key: dept\n       -> Seq Scan on employees\n            (cost=0.00..15.00 rows=500)\n            (actual time=0.021..0.089 rows=10 loops=1)\nPlanning Time: 0.312 ms\nExecution Time: 2.891 ms`,
+         en:`actual time=first..last ms — real time to first and last row. loops= how many times this node ran. Planning Time + Execution Time at the bottom give the full picture.`
+       },
+       pills:[
+         {key:'actual time=a..b', keyColor:'green',  desc:'real ms — first row..last row'},
+         {key:'loops=n',          keyColor:'blue',   desc:'how many times this node executed'},
+         {key:'Planning Time',    keyColor:'yellow', desc:'time to build the query plan'},
+         {key:'Execution Time',   keyColor:'purple', desc:'actual runtime of the full query'},
+         {key:'rows= mismatch',   keyColor:'red',    desc:'estimated vs actual rows differ — may need ANALYZE to update stats'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'RANGE BETWEEN — Value-based Windows',
+    cards:[
+      {id:'a14',title:'RANGE BETWEEN — value distance',tag:'FRAME',tagClass:'qtag-frame',
+       sql:hl(
+`SELECT
+  name,
+  salary,
+
+  SUM(salary) OVER (
+    ORDER BY salary
+    RANGE BETWEEN 2000 PRECEDING AND CURRENT ROW
+  ) AS range_2000_back,
+
+  SUM(salary) OVER (
+    ORDER BY salary
+    RANGE BETWEEN 2000 PRECEDING AND 2000 FOLLOWING
+  ) AS range_2000_both,
+
+  SUM(salary) OVER (
+    ORDER BY salary
+    RANGE BETWEEN 5000 PRECEDING AND CURRENT ROW
+  ) AS range_5000_back,
+
+  SUM(salary) OVER (
+    ORDER BY salary
+    RANGE BETWEEN CURRENT ROW AND 3000 FOLLOWING
+  ) AS range_3000_forward
+
+FROM employees
+ORDER BY salary;`),
+       glowKw:'RANGE',
+       expAr:'RANGE BETWEEN مع رقم بتحدد نطاق قيم مش عدد صفوف — يعني "كل الموظفين اللي راتبهم في نطاق ±X من راتبي".',
+       expEn:'RANGE with a number defines a VALUE distance, not a row count — includes all rows where the ORDER BY column is within that numeric range.',
+       framePills:[
+         {key:'RANGE BETWEEN 2000 PRECEDING AND CURRENT ROW', keyColor:'green',  desc:'all rows where salary ≥ current - 2000'},
+         {key:'RANGE BETWEEN 2000 PRECEDING AND 2000 FOLLOWING', keyColor:'blue', desc:'all rows within ±2000 of current salary'},
+         {key:'RANGE BETWEEN 5000 PRECEDING AND CURRENT ROW', keyColor:'purple', desc:'all rows where salary ≥ current - 5000 (back only, no forward)'},
+         {key:'AND CURRENT ROW = upper cap', keyColor:'red', desc:'can never include rows above current — CURRENT ROW is the ceiling'},
+         {key:'RANGE BETWEEN CURRENT ROW AND 3000 FOLLOWING', keyColor:'yellow', desc:'current + all rows earning up to 3000 more'},
+         {key:'RANGE vs ROWS', keyColor:'red', desc:'ROWS counts physical rows — RANGE uses value distance'},
+       ]},
+    ]
+  },
+  {
+    sectionLabel:'CUME_DIST / NTH_VALUE',
+    cards:[
+      {id:'a17',title:'CUME_DIST',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`SELECT
+  name, salary,
+  ROUND(CUME_DIST() OVER (ORDER BY salary)::NUMERIC, 3)       AS cume_dist,
+  ROUND(CUME_DIST() OVER (ORDER BY salary) * 100, 1)          AS percentile,
+  ROUND(PERCENT_RANK() OVER (ORDER BY salary)::NUMERIC, 3)    AS pct_rank_compare
+FROM employees
+ORDER BY salary;`),
+       glowKw:'WITH',
+       expAr:`CUME_DIST بترجع نسبة الصفوف اللي قيمتها أقل من أو تساوي الصف الحالي — يعني لو ناتجها 0.7 معناه 70% من الموظفين راتبهم أقل منك أو زيك.
+
+الفرق الجوهري بينها وبين PERCENT_RANK:
+• CUME_DIST بتحسب: (عدد الصفوف ≤ الحالي) / (إجمالي الصفوف) — النتيجة دايماً > 0 وممكن توصل 1.0
+• PERCENT_RANK بتحسب: (rank - 1) / (إجمالي - 1) — أول صف دايماً = 0
+
+يعني CUME_DIST أكتر fairness لأنها بتحسب التساوي بشكل صح.`,
+       expEn:'CUME_DIST returns the fraction of rows with values ≤ current row. Unlike PERCENT_RANK, first row is never 0 and it includes ties properly.',
+       pills:[
+         {key:'CUME_DIST',    keyColor:'green',  desc:'(rows ≤ current) / total — always > 0, can reach 1.0'},
+         {key:'PERCENT_RANK', keyColor:'blue',   desc:'(rank-1) / (total-1) — first row always = 0'},
+         {key:'ties',         keyColor:'yellow', desc:'CUME_DIST: ties get same value. PERCENT_RANK: ties also same'},
+         {key:'use case',     keyColor:'purple', desc:'find what % of data falls below a given value'},
+       ]},
+      {id:'a18',title:'NTH_VALUE',tag:'WINDOW',tagClass:'qtag-window',
+       sql:hl(
+`SELECT
+  name, dept, salary,
+  NTH_VALUE(salary, 1) OVER (
+    PARTITION BY dept ORDER BY salary DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS highest_salary,
+  NTH_VALUE(salary, 2) OVER (
+    PARTITION BY dept ORDER BY salary DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS second_highest,
+  NTH_VALUE(name, 1) OVER (
+    PARTITION BY dept ORDER BY salary DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS top_earner_name
+FROM employees
+ORDER BY dept, salary DESC;`),
+       glowKw:'WITH',
+       expAr:`NTH_VALUE بتجيب الـ n-th قيمة في الـ window — زي FIRST_VALUE بس بتقدر تحدد أي رقم تريبه.
+
+تنبيه مهم: لازم تكتب ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING — من غيرها الـ frame الافتراضي بيوقف عند الصف الحالي فالصفوف اللي بعد ما يلاقوش الـ nth value وبترجع NULL.
+
+NTH_VALUE(col, 1) = FIRST_VALUE(col) بالظبط.`,
+       expEn:'NTH_VALUE returns the value at position n in the window — like FIRST_VALUE but for any position. Requires UNBOUNDED FOLLOWING or later rows return NULL.',
+       pills:[
+         {key:'NTH_VALUE(col, 1)', keyColor:'green',  desc:'same as FIRST_VALUE — first in window'},
+         {key:'NTH_VALUE(col, 2)', keyColor:'blue',   desc:'second value in window by ORDER BY'},
+         {key:'UNBOUNDED FOLLOWING required', keyColor:'red', desc:'without it, rows after nth position return NULL'},
+         {key:'PARTITION BY',      keyColor:'purple', desc:'resets nth position per group'},
+       ]},
+    ]
+  },
+];
+
+/* ══════════════════════════════════════════
+   RENDER ALL CARDS INTO DOM
+══════════════════════════════════════════ */
+function renderSection(containerId, sections) {
+  const container = document.getElementById(containerId);
+  let html = '';
+  sections.forEach(section => {
+    html += `<div class="section-label">${section.sectionLabel}</div>`;
+    section.cards.forEach(c => { html += buildCard(c); });
+  });
+  container.innerHTML = html;
+}
+
+queryFunctions['m12'] = () => employees.map(e=>({
+  name:e.name, salary:e.salary,
+  salary_grade: e.salary < 7500 ? 'Low' : e.salary < 10000 ? 'Mid' : 'Senior'
+})).sort((a,b)=>b.salary-a.salary);
+
+queryFunctions['m13'] = () => employees.map(e=>({
+  name:e.name, dept:e.dept,
+  dept_category: e.dept==='Engineering' ? 'Technical' : e.dept==='Management' ? 'Leadership' : 'Support'
+})).sort((a,b)=>a.dept_category.localeCompare(b.dept_category));
+
+// Beginner new
+queryFunctions['b15'] = () => [...new Set(employees.map(e=>e.dept))].sort().map(d=>({dept:d}));
+queryFunctions['b16'] = () => employees.filter(e=>!e.dept).map(e=>({name:e.name,dept:e.dept}));
+queryFunctions['b17'] = () => employees.map(e=>({name:e.name,dept:e.dept,dept_display:e.dept||'No Department'}));
+queryFunctions['b18'] = () => employees.map(e=>({name:e.name,salary:e.salary,dept_nulled:e.dept==='HR'?null:e.dept}));
+queryFunctions['b19'] = () => employees.filter(e=>e.name.toLowerCase().includes('omar')).map(e=>({name:e.name,dept:e.dept}));
+
+// Intermediate new
+queryFunctions['m14'] = () => employees.filter(e=>departments.some(d=>d.dept_name===e.dept&&d.location==='Cairo')).map(e=>({name:e.name,dept:e.dept}));
+queryFunctions['m15'] = () => departments.filter(d=>!employees.some(e=>e.dept===d.dept_name)).map(d=>({dept_name:d.dept_name,location:d.location}));
+queryFunctions['m16'] = () => employees.slice(0,5).map(e=>({name:e.name,full_label:`${e.name} — ${e.dept}`,piped:`${e.name} | ${e.dept}`,trimmed:e.name.trim(),short_dept:e.dept.replace('Engineering','Eng')}));
+queryFunctions['m17'] = () => {
+  const avg=employees.reduce((s,e)=>s+e.salary,0)/employees.length;
+  return employees.slice(0,5).map(e=>({name:e.name,salary:e.salary,raw_avg:parseFloat(avg.toFixed(4)),rounded:parseFloat(avg.toFixed(2)),ceiling:Math.ceil(avg),floor:Math.floor(avg)}));
+};
+queryFunctions['m18'] = () => employees.slice(0,5).map(e=>({name:e.name,salary:e.salary,salary_text:String(e.salary),converted_date:'2024-01-01',pg_shorthand:String(e.salary)}));
+queryFunctions['m19'] = () => [...employees].sort((a,b)=>new Date(a.date_of_joining)-new Date(b.date_of_joining)).map(e=>{
+  const d=new Date(e.date_of_joining);
+  return {name:e.name,date_of_joining:e.date_of_joining,join_month:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`,join_year:`${d.getFullYear()}-01-01`};
+});
+
+queryFunctions['m20'] = () => [...employees].sort((a,b)=>a.name.localeCompare(b.name)).map(e=>({
+  name:e.name,
+  pos_of_a: e.name.toLowerCase().indexOf('a')+1 || 0,
+  first_5:  e.name.slice(0,5),
+  last_5:   e.name.slice(-5),
+  reversed: e.name.split('').reverse().join('')
+}));
+
+queryFunctions['m21'] = () => [...employees].sort((a,b)=>a.name.localeCompare(b.name)).map(e=>({
+  name:       e.name,
+  padded_salary: String(e.salary).padStart(8,'0'),
+  padded_name:   e.name.padEnd(20,'.'),
+  first_name:    e.name.split(' ')[0],
+  last_name:     e.name.split(' ')[1] || ''
+}));
+
+queryFunctions['m22'] = () => [...employees].map(e=>({
+  name:       e.name,
+  salary:     e.salary,
+  diff_from_9k: Math.abs(e.salary - 9000),
+  is_odd:     e.id % 2,
+  two_to_ten: Math.pow(2,10),
+  random_val: parseFloat(Math.random().toFixed(4))
+}));
+
+queryFunctions['m23'] = () => {
+  const g={};
+  employees.forEach(e=>{
+    if(!g[e.dept])g[e.dept]={dept:e.dept,total:0,unique_ages:new Set(),names:[],namesBySalary:[]};
+    g[e.dept].total++;
+    g[e.dept].unique_ages.add(e.age);
+    g[e.dept].names.push(e.name);
+    g[e.dept].namesBySalary.push({name:e.name,salary:e.salary});
+  });
+  return Object.values(g).sort((a,b)=>a.dept.localeCompare(b.dept)).map(r=>({
+    dept: r.dept, total: r.total, unique_ages: r.unique_ages.size,
+    all_names: r.names.join(', '),
+    names_by_salary: r.namesBySalary.sort((a,b)=>b.salary-a.salary).map(x=>x.name).join(', ')
+  }));
+};
+
+// Regex query functions
+queryFunctions['m24'] = () => messages.map(m=>({sender:m.sender,content:m.content,category:m.category}));
+queryFunctions['m25'] = () => messages.filter(m=>/^[A-Z]/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m26'] = () => messages.filter(m=>/\d+/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m27'] = () => messages.filter(m=>/\$[0-9]+/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m28'] = () => messages.filter(m=>/error|warning/i.test(m.content)).map(m=>({sender:m.sender,content:m.content,category:m.category}));
+queryFunctions['m29'] = () => messages.filter(m=>/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m30'] = () => messages.filter(m=>/[A-Z]{2,}/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m31'] = () => messages.filter(m=>!/\d/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m32'] = () => messages.filter(m=>/[!?.]$/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m33'] = () => messages.filter(m=>/\d{4}-\d{2}-\d{2}/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m34'] = () => messages.filter(m=>/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(m.content)).map(m=>{
+  const match = m.content.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  return {sender:m.sender, content:m.content, extracted_email: match ? match[0] : null};
+});
+
+queryFunctions['m35'] = () => messages.filter(m=>/done/i.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m36'] = () => messages.filter(m=>/budget|price|approved/i.test(m.content)).map(m=>({sender:m.sender,content:m.content,category:m.category}));
+queryFunctions['m37'] = () => messages.filter(m=>!/\$|\d{5,}/.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m38'] = () => messages.filter(m=>!/^(ERROR|WARNING)/.test(m.content) && !/system/.test(m.category)).map(m=>({sender:m.sender,content:m.content,category:m.category}));
+queryFunctions['m39'] = () => messages.filter(m=>!/error|warning|failed/i.test(m.content)).map(m=>({sender:m.sender,content:m.content}));
+queryFunctions['m40'] = () => messages.filter(m=>!/budget|price|\$|approved/i.test(m.content) && !/finance/i.test(m.category)).map(m=>({sender:m.sender,content:m.content,category:m.category}));
+
+// EXPLAIN — simulated output
+queryFunctions['a15'] = () => [
+  {node:'Sort',            detail:'Sort Key: salary DESC',              'cost(est)':'45.23..46.48', 'rows(est)':500, width:36},
+  {node:'→ Seq Scan',      detail:"Filter: (dept = 'Engineering')",     'cost(est)':'0.00..21.00',  'rows(est)':500, width:36},
+];
+queryFunctions['a16'] = () => [
+  {node:'Sort',            detail:'Sort Key: avg DESC',   'cost(est)':'45.23..46.48','actual_time':'2.341..2.345 ms','actual_rows':4},
+  {node:'→ HashAggregate', detail:'Group Key: dept',      'cost(est)':'21.00..26.00','actual_time':'1.203..1.215 ms','actual_rows':4},
+  {node:'→→ Seq Scan',     detail:'on employees',         'cost(est)':'0.00..15.00', 'actual_time':'0.021..0.089 ms','actual_rows':10},
+  {node:'Planning Time',   detail:'',                     'cost(est)':'—',           'actual_time':'0.312 ms',       'actual_rows':'—'},
+  {node:'Execution Time',  detail:'',                     'cost(est)':'—',           'actual_time':'2.891 ms',       'actual_rows':'—'},
+];
+
+// Advanced new
+queryFunctions['a8'] = () => employees.filter(e=>e.salary>9000).sort((a,b)=>b.salary-a.salary).map(e=>({name:e.name,salary:e.salary,dept:e.dept}));
+queryFunctions['a9'] = () => {
+  const deptAvg={};
+  employees.forEach(e=>{if(!deptAvg[e.dept]){const g=employees.filter(x=>x.dept===e.dept);deptAvg[e.dept]=g.reduce((s,x)=>s+x.salary,0)/g.length;}});
+  return employees.filter(e=>e.salary>deptAvg[e.dept]).map(e=>({name:e.name,salary:e.salary,dept:e.dept,avg_salary:Math.round(deptAvg[e.dept]),diff_from_avg:Math.round(e.salary-deptAvg[e.dept])})).sort((a,b)=>b.diff_from_avg-a.diff_from_avg);
+};
+queryFunctions['a10'] = () => {
+  const byDept={};
+  employees.forEach(e=>{if(!byDept[e.dept])byDept[e.dept]=[];byDept[e.dept].push(e.salary);});
+  return [...employees].sort((a,b)=>a.dept.localeCompare(b.dept)||b.salary-a.salary).map(e=>({
+    name:e.name,dept:e.dept,salary:e.salary,
+    dept_max_salary:Math.max(...byDept[e.dept]),
+    dept_min_salary:Math.min(...byDept[e.dept])
+  }));
+};
+queryFunctions['a11'] = () => {
+  const sorted=[...employees].sort((a,b)=>b.salary-a.salary);
+  const n=sorted.length;
+  return sorted.map((e,i)=>({
+    name:e.name,salary:e.salary,
+    quartile:Math.ceil((i+1)/n*4)||1,
+    tercile:Math.ceil((i+1)/n*3)||1
+  }));
+};
+queryFunctions['a12'] = () => {
+  const sorted=[...employees].sort((a,b)=>a.salary-b.salary);
+  const n=sorted.length;
+  return [...employees].sort((a,b)=>b.salary-a.salary).map(e=>{
+    const rank=sorted.findIndex(x=>x.id===e.id);
+    const pct=parseFloat((rank/(n-1)).toFixed(3));
+    return {name:e.name,salary:e.salary,pct_rank:pct,percentile:parseFloat((pct*100).toFixed(1))};
+  });
+};
+queryFunctions['a13'] = () => {
+  const g={};
+  employees.forEach(e=>{
+    if(!g[e.dept])g[e.dept]={dept:e.dept,total:0,high_earners:0,normal_earners:0,_sum30:0,_cnt30:0};
+    g[e.dept].total++;
+    if(e.salary>9000)g[e.dept].high_earners++;else g[e.dept].normal_earners++;
+    if(e.age>30){g[e.dept]._sum30+=e.salary;g[e.dept]._cnt30++;}
+  });
+  return Object.values(g).map(r=>({dept:r.dept,total:r.total,high_earners:r.high_earners,normal_earners:r.normal_earners,avg_salary_over30:r._cnt30?Math.round(r._sum30/r._cnt30):null})).sort((a,b)=>a.dept.localeCompare(b.dept));
+};
+
+queryFunctions['a14'] = () => {
+  const sorted = [...employees].sort((a,b)=>a.salary-b.salary);
+  return sorted.map(e => {
+    const range_2000_back     = sorted.filter(x => x.salary >= e.salary-2000 && x.salary <= e.salary).reduce((s,x)=>s+x.salary,0);
+    const range_2000_both     = sorted.filter(x => x.salary >= e.salary-2000 && x.salary <= e.salary+2000).reduce((s,x)=>s+x.salary,0);
+    const range_5000_back     = sorted.filter(x => x.salary >= e.salary-5000 && x.salary <= e.salary).reduce((s,x)=>s+x.salary,0);
+    const range_3000_forward  = sorted.filter(x => x.salary >= e.salary && x.salary <= e.salary+3000).reduce((s,x)=>s+x.salary,0);
+    return {name:e.name, salary:e.salary, range_2000_back, range_2000_both, range_5000_back, range_3000_forward};
+  });
+};
+
+queryFunctions['a17'] = () => {
+  const sorted = [...employees].sort((a,b)=>a.salary-b.salary);
+  const n = sorted.length;
+  return sorted.map((e,i) => {
+    const cumeDist = parseFloat(((i+1)/n).toFixed(3));
+    const rank = i+1;
+    const pctRank = n===1 ? 0 : parseFloat(((rank-1)/(n-1)).toFixed(3));
+    return {name:e.name, salary:e.salary, cume_dist:cumeDist, percentile:parseFloat((cumeDist*100).toFixed(1)), pct_rank_compare:pctRank};
+  });
+};
+
+queryFunctions['a18'] = () => {
+  const byDept = {};
+  employees.forEach(e => {
+    if (!byDept[e.dept]) byDept[e.dept] = [];
+    byDept[e.dept].push(e);
+  });
+  return [...employees].sort((a,b)=>a.dept.localeCompare(b.dept)||b.salary-a.salary).map(e => {
+    const group = byDept[e.dept].slice().sort((a,b)=>b.salary-a.salary);
+    return {
+      name: e.name, dept: e.dept, salary: e.salary,
+      highest_salary: group[0]?.salary ?? null,
+      second_highest: group[1]?.salary ?? null,
+      top_earner_name: group[0]?.name ?? null,
+    };
+  });
+};
+
+/* ══════════════════════════════════════════
+   DML PAGE DATA
+══════════════════════════════════════════ */
+const dmlSections = [
+  {
+    id:'delete', badge:'delete', title:'DELETE — حذف صفوف',
+    ar:'بتحذف صفوف من الجدول بناءً على شرط — لو مكتبتش WHERE هتحذف كل الجدول. بتقدر ترجعها لو عندك transaction مفتوحة.',
+    en:'Removes rows matching the WHERE condition. Without WHERE, deletes all rows. Can be rolled back in a transaction.',
+    syntax:`DELETE FROM table_name\nWHERE condition;`,
+    note:'⚠️ Always use WHERE — without it, deletes EVERY row in the table.',
+    cards:[
+      {id:'d1', title:'Delete by ID',
+       sql:`DELETE FROM employees\nWHERE id = 10;`,
+       preview: ()=> employees.filter(e=>e.id===10).map(e=>({id:e.id,name:e.name,dept:e.dept,salary:e.salary})),
+       affected: ()=> employees.filter(e=>e.id===10).length},
+      {id:'d2', title:'Delete by condition',
+       sql:`DELETE FROM employees\nWHERE dept = 'HR' AND salary < 7000;`,
+       preview: ()=> employees.filter(e=>e.dept==='HR'&&e.salary<7000).map(e=>({id:e.id,name:e.name,dept:e.dept,salary:e.salary})),
+       affected: ()=> employees.filter(e=>e.dept==='HR'&&e.salary<7000).length},
+      {id:'d3', title:'Delete with subquery — below average salary',
+       sql:`DELETE FROM employees\nWHERE id IN (\n  SELECT id FROM employees\n  WHERE salary < (SELECT AVG(salary) FROM employees)\n);`,
+       preview: ()=>{ const avg=employees.reduce((s,e)=>s+e.salary,0)/employees.length; return employees.filter(e=>e.salary<avg).map(e=>({id:e.id,name:e.name,salary:e.salary,dept:e.dept})); },
+       affected: ()=>{ const avg=employees.reduce((s,e)=>s+e.salary,0)/employees.length; return employees.filter(e=>e.salary<avg).length; }},
+    ]
+  },
+  {
+    id:'truncate', badge:'truncate', title:'TRUNCATE — مسح كل الجدول',
+    ar:'بتمسح كل الصفوف من الجدول بسرعة — أسرع بكتير من DELETE بدون WHERE لأنها مش بتسجل كل صف في الـ log. مفيش WHERE خالص.',
+    en:'Removes ALL rows instantly — much faster than DELETE with no WHERE. Cannot use a WHERE clause. Resets sequences optionally.',
+    syntax:`TRUNCATE TABLE table_name;\nTRUNCATE TABLE table_name RESTART IDENTITY;\nTRUNCATE TABLE table_name CASCADE;`,
+    note:'⚠️ No WHERE allowed — always removes ALL rows. Cannot be filtered.',
+    cards:[
+      {id:'t1', title:'Simple TRUNCATE',
+       sql:`TRUNCATE TABLE employees;`,
+       preview: ()=> employees.map(e=>({id:e.id,name:e.name,dept:e.dept,salary:e.salary})),
+       affected: ()=> employees.length},
+      {id:'t2', title:'TRUNCATE RESTART IDENTITY — reset auto-increment',
+       sql:`TRUNCATE TABLE employees RESTART IDENTITY;`,
+       preview: ()=> employees.map(e=>({id:e.id,name:e.name})),
+       affected: ()=> employees.length,
+       note2:'RESTART IDENTITY resets the id sequence back to 1 — next inserted row gets id=1 again.'},
+      {id:'t3', title:'TRUNCATE CASCADE — also truncate related tables',
+       sql:`TRUNCATE TABLE departments CASCADE;`,
+       preview: ()=> departments.map(d=>({dept_id:d.dept_id,dept_name:d.dept_name})),
+       affected: ()=> departments.length,
+       note2:'CASCADE truncates all tables that have foreign keys referencing this table — use with caution.'},
+    ]
+  },
+  {
+    id:'update', badge:'update', title:'UPDATE — تعديل البيانات',
+    ar:'بتعدّل قيم موجودة في صفوف معينة — بتحدد العمود والقيمة الجديدة بالـ SET وبتحدد الصفوف بالـ WHERE. بدون WHERE بتعدّل كل الجدول.',
+    en:'Modifies existing row values — SET specifies what to change, WHERE specifies which rows. Without WHERE, updates every row.',
+    syntax:`UPDATE table_name\nSET column = value\nWHERE condition;`,
+    note:'⚠️ Always use WHERE — without it, updates EVERY row in the table.',
+    cards:[
+      {id:'u1', title:'Update one column by ID',
+       sql:`UPDATE employees\nSET salary = 10000\nWHERE id = 1;`,
+       preview: ()=> employees.filter(e=>e.id===1).map(e=>({id:e.id,name:e.name,old_salary:e.salary,new_salary:10000})),
+       affected: ()=> employees.filter(e=>e.id===1).length},
+      {id:'u2', title:'Update multiple columns — 10% raise + dept change',
+       sql:`UPDATE employees\nSET salary = salary * 1.10,\n    dept   = 'Engineering'\nWHERE dept = 'HR';`,
+       preview: ()=> employees.filter(e=>e.dept==='HR').map(e=>({name:e.name,old_salary:e.salary,new_salary:Math.round(e.salary*1.1),old_dept:e.dept,new_dept:'Engineering'})),
+       affected: ()=> employees.filter(e=>e.dept==='HR').length},
+      {id:'u3', title:'Update with subquery — set salary to company average',
+       sql:`UPDATE employees\nSET salary = (SELECT ROUND(AVG(salary)) FROM employees)\nWHERE salary < (SELECT AVG(salary) FROM employees);`,
+       preview: ()=>{ const avg=Math.round(employees.reduce((s,e)=>s+e.salary,0)/employees.length); return employees.filter(e=>e.salary<avg).map(e=>({name:e.name,old_salary:e.salary,new_salary:avg})); },
+       affected: ()=>{ const avg=employees.reduce((s,e)=>s+e.salary,0)/employees.length; return employees.filter(e=>e.salary<avg).length; }},
+    ]
+  },
+  {
+    id:'alter', badge:'alter', title:'ALTER TABLE — تعديل هيكل الجدول',
+    ar:'بتعدّل هيكل الجدول نفسه — مش البيانات. بتقدر تضيف عمود أو تحذفه أو تغيّر نوعه أو اسمه. DDL مش DML.',
+    en:'Modifies the table structure — not the data. Add/drop/rename columns, change types, set defaults, rename the table.',
+    syntax:`ALTER TABLE table_name ADD COLUMN ...;\nALTER TABLE table_name DROP COLUMN ...;\nALTER TABLE table_name RENAME COLUMN old TO new;\nALTER TABLE table_name ALTER COLUMN col TYPE new_type;\nALTER TABLE table_name ALTER COLUMN col SET DEFAULT val;\nALTER TABLE table_name RENAME TO new_name;`,
+    note:null,
+    cards:[
+      {id:'al1', title:'ADD COLUMN — إضافة عمود جديد',
+       ar:'بتضيف عمود جديد للجدول — ممكن تحدد نوعه وقيمة افتراضية. الصفوف الموجودة هتاخد الـ DEFAULT أو NULL.',
+       en:'Adds a new column — existing rows get the DEFAULT value or NULL if no default set.',
+       sql:`-- Example 1: simple column\nALTER TABLE employees ADD COLUMN phone VARCHAR(20);\n\n-- Example 2: with default\nALTER TABLE employees ADD COLUMN is_active BOOLEAN DEFAULT true;\n\n-- Example 3: NOT NULL with default\nALTER TABLE employees ADD COLUMN bonus INTEGER NOT NULL DEFAULT 0;`,
+       ddl:true},
+      {id:'al2', title:'DROP COLUMN — حذف عمود',
+       ar:'بتحذف عمود وكل بياناته نهائياً — مفيش رجوع. IF EXISTS بتحمي من الـ error لو العمود مش موجود.',
+       en:'Permanently removes a column and all its data — irreversible. IF EXISTS prevents errors if column does not exist.',
+       sql:`-- Example 1: simple drop\nALTER TABLE employees DROP COLUMN phone;\n\n-- Example 2: safe drop\nALTER TABLE employees DROP COLUMN IF EXISTS phone;\n\n-- Example 3: with cascade\nALTER TABLE employees DROP COLUMN dept CASCADE;`,
+       ddl:true},
+      {id:'al3', title:'RENAME COLUMN — تغيير اسم عمود',
+       ar:'بتغيّر اسم عمود موجود من غير ما تمس البيانات — البيانات بتفضل موجودة بالظبط زي ما هي.',
+       en:'Renames a column without touching its data — safest ALTER operation.',
+       sql:`-- Example 1\nALTER TABLE employees RENAME COLUMN name TO full_name;\n\n-- Example 2\nALTER TABLE employees RENAME COLUMN dept TO department;\n\n-- Example 3\nALTER TABLE employees RENAME COLUMN date_of_joining TO join_date;`,
+       ddl:true},
+      {id:'al4', title:'ALTER COLUMN TYPE — تغيير نوع البيانات',
+       ar:'بتغيّر نوع بيانات عمود موجود — ممكن يفشل لو البيانات الموجودة مش قابلة للتحويل. USING بتحدد إزاي يتم التحويل.',
+       en:'Changes the data type of a column — may fail if existing data cannot be cast. Use USING to specify the conversion expression.',
+       sql:`-- Example 1: integer to bigint\nALTER TABLE employees ALTER COLUMN salary TYPE BIGINT;\n\n-- Example 2: with USING cast\nALTER TABLE employees ALTER COLUMN salary TYPE VARCHAR(20)\n  USING salary::VARCHAR;\n\n-- Example 3: date to timestamp\nALTER TABLE employees ALTER COLUMN date_of_joining TYPE TIMESTAMP\n  USING date_of_joining::TIMESTAMP;`,
+       ddl:true},
+      {id:'al5', title:'SET / DROP DEFAULT — تعيين قيمة افتراضية',
+       ar:'SET DEFAULT بتحط قيمة افتراضية للعمود — بتأثر على الصفوف الجديدة بس مش الموجودة. DROP DEFAULT بتشيل القيمة الافتراضية.',
+       en:'SET DEFAULT affects new rows only — existing rows are unchanged. DROP DEFAULT removes the default so new rows get NULL.',
+       sql:`-- Example 1: set default\nALTER TABLE employees ALTER COLUMN dept SET DEFAULT 'General';\n\n-- Example 2: drop default\nALTER TABLE employees ALTER COLUMN dept DROP DEFAULT;\n\n-- Example 3: numeric default\nALTER TABLE employees ALTER COLUMN salary SET DEFAULT 5000;`,
+       ddl:true},
+      {id:'al6', title:'RENAME TABLE — تغيير اسم الجدول',
+       ar:'بتغيّر اسم الجدول كله — كل الـ queries اللي بتستخدم الاسم القديم هتحتاج تتعدّل.',
+       en:'Renames the entire table — all queries using the old name will need to be updated.',
+       sql:`-- Example 1\nALTER TABLE employees RENAME TO staff;\n\n-- Example 2\nALTER TABLE departments RENAME TO teams;\n\n-- Example 3: rename back\nALTER TABLE staff RENAME TO employees;`,
+       ddl:true},
+    ]
+  },
+];
+
+function toggleDmlCard(id) {
+  document.getElementById('dml-card-'+id).classList.toggle('expanded');
+}
+
+function buildDmlPage() {
+  const container = document.getElementById('content-dml');
+  let html = '';
+
+  dmlSections.forEach(sec => {
+    html += `<div class="dml-section">
+      <div class="dml-section-title">
+        <span class="dml-badge ${sec.badge}">${sec.id.toUpperCase()}</span>
+        ${sec.title}
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.5rem;display:flex;flex-direction:column;gap:8px;">
+        <div class="dml-func-ar">${sec.ar}</div>
+        <div class="dml-func-en">${sec.en}</div>
+        <div class="syntax-block">${sec.syntax}</div>
+        ${sec.note ? `<div class="dml-note">${sec.note}</div>` : ''}
+      </div>`;
+
+    sec.cards.forEach(card => {
+      if (card.ddl) {
+        html += `
+        <div class="dml-card" id="dml-card-${card.id}">
+          <div class="dml-card-header" onclick="toggleDmlCard('${card.id}')">
+            <span class="dml-card-title">${card.title}</span>
+            <span class="dml-card-chevron">▼</span>
+          </div>
+          <div class="dml-card-body">
+            <div class="dml-func-ar">${card.ar}</div>
+            <div class="dml-func-en">${card.en}</div>
+            <div class="query-block"><button class="copy-btn" onclick="copySQL(this)">COPY</button>${hl(card.sql)}</div>
+            <div class="ddl-note">📐 DDL statement — modifies table structure, no rows returned.</div>
+          </div>
+        </div>`;
+      } else {
+        const previewRows = card.preview();
+        const affectedCount = card.affected();
+        html += `
+        <div class="dml-card" id="dml-card-${card.id}">
+          <div class="dml-card-header" onclick="toggleDmlCard('${card.id}')">
+            <span class="dml-card-title">${card.title}</span>
+            <span class="dml-card-chevron">▼</span>
+          </div>
+          <div class="dml-card-body">
+            <div class="query-block"><button class="copy-btn" onclick="copySQL(this)">COPY</button>${hl(card.sql)}</div>
+            ${card.note2 ? `<div class="dml-note">${card.note2}</div>` : ''}
+            <div class="dml-affected">✓ Rows affected: <strong>${affectedCount}</strong></div>
+            <div class="output-label">Preview — rows that would be affected <span>${affectedCount} rows</span></div>
+            ${renderTable(previewRows)}
+          </div>
+        </div>`;
+      }
+    });
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+buildDmlPage();
+const practiceQuestions = {
+  beg:[
+    {
+      q:'Get all employees older than 28.',
+      sql:`SELECT name, age, dept\nFROM employees\nWHERE age > 28\nORDER BY age DESC;`,
+      fn: ()=> [...employees].filter(e=>e.age>28).sort((a,b)=>b.age-a.age).map(e=>({name:e.name,age:e.age,dept:e.dept}))
+    },
+    {
+      q:'Get employees in HR or Marketing, ordered by salary DESC.',
+      sql:`SELECT name, dept, salary\nFROM employees\nWHERE dept IN ('HR', 'Marketing')\nORDER BY salary DESC;`,
+      fn: ()=> employees.filter(e=>['HR','Marketing'].includes(e.dept)).sort((a,b)=>b.salary-a.salary).map(e=>({name:e.name,dept:e.dept,salary:e.salary}))
+    },
+    {
+      q:"Get employees whose name contains the letter 'a' (case-insensitive).",
+      sql:`SELECT name, dept\nFROM employees\nWHERE LOWER(name) LIKE '%a%';`,
+      fn: ()=> employees.filter(e=>e.name.toLowerCase().includes('a')).map(e=>({name:e.name,dept:e.dept}))
+    },
+    {
+      q:'Get employees with salary between 7000 and 10000.',
+      sql:`SELECT name, salary\nFROM employees\nWHERE salary BETWEEN 7000 AND 10000\nORDER BY salary;`,
+      fn: ()=> employees.filter(e=>e.salary>=7000&&e.salary<=10000).sort((a,b)=>a.salary-b.salary).map(e=>({name:e.name,salary:e.salary}))
+    },
+    {
+      q:'Get the 3 youngest employees.',
+      sql:`SELECT name, age\nFROM employees\nORDER BY age ASC\nLIMIT 3;`,
+      fn: ()=> [...employees].sort((a,b)=>a.age-b.age).slice(0,3).map(e=>({name:e.name,age:e.age}))
+    },
+    {
+      q:'Get all unique department names.',
+      sql:`SELECT DISTINCT dept\nFROM employees\nORDER BY dept;`,
+      fn: ()=> [...new Set(employees.map(e=>e.dept))].sort().map(d=>({dept:d}))
+    },
+  ],
+  int:[
+    {
+      q:'Get the department with the highest total salary.',
+      sql:`SELECT dept, SUM(salary) AS total_salary\nFROM employees\nGROUP BY dept\nORDER BY total_salary DESC\nLIMIT 1;`,
+      fn: ()=>{ const g={}; employees.forEach(e=>{g[e.dept]=(g[e.dept]||0)+e.salary;}); return Object.entries(g).sort((a,b)=>b[1]-a[1]).slice(0,1).map(([dept,total_salary])=>({dept,total_salary})); }
+    },
+    {
+      q:'Get employees earning above the company average salary.',
+      sql:`SELECT name, salary, dept\nFROM employees\nWHERE salary > (SELECT AVG(salary) FROM employees)\nORDER BY salary DESC;`,
+      fn: ()=>{ const avg=employees.reduce((s,e)=>s+e.salary,0)/employees.length; return employees.filter(e=>e.salary>avg).sort((a,b)=>b.salary-a.salary).map(e=>({name:e.name,salary:e.salary,dept:e.dept})); }
+    },
+    {
+      q:"Get each employee's name alongside their department's location using JOIN.",
+      sql:`SELECT e.name, e.dept, d.location\nFROM employees e\nINNER JOIN departments d ON e.dept = d.dept_name\nORDER BY e.name;`,
+      fn: ()=> employees.map(e=>{ const d=departments.find(d=>d.dept_name===e.dept); return d?{name:e.name,dept:e.dept,location:d.location}:null; }).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name))
+    },
+    {
+      q:'Get departments that have more than 2 employees.',
+      sql:`SELECT dept, COUNT(*) AS emp_count\nFROM employees\nGROUP BY dept\nHAVING COUNT(*) > 2\nORDER BY emp_count DESC;`,
+      fn: ()=>{ const g={}; employees.forEach(e=>{g[e.dept]=(g[e.dept]||0)+1;}); return Object.entries(g).filter(([,c])=>c>2).sort((a,b)=>b[1]-a[1]).map(([dept,emp_count])=>({dept,emp_count})); }
+    },
+    {
+      q:"Get the first 5 characters of each employee's name and their salary.",
+      sql:`SELECT SUBSTRING(name, 1, 5) AS short_name, salary\nFROM employees\nORDER BY salary DESC;`,
+      fn: ()=> [...employees].sort((a,b)=>b.salary-a.salary).map(e=>({short_name:e.name.substring(0,5),salary:e.salary}))
+    },
+    {
+      q:'Get employees who joined before 2021, show years in company (assume current year = 2024).',
+      sql:`SELECT name, date_of_joining,\n  2024 - EXTRACT(YEAR FROM date_of_joining) AS years_in_company\nFROM employees\nWHERE EXTRACT(YEAR FROM date_of_joining) < 2021\nORDER BY years_in_company DESC;`,
+      fn: ()=> employees.filter(e=>new Date(e.date_of_joining).getFullYear()<2021).map(e=>({name:e.name,date_of_joining:e.date_of_joining,years_in_company:2024-new Date(e.date_of_joining).getFullYear()})).sort((a,b)=>b.years_in_company-a.years_in_company)
+    },
+  ],
+  adv:[
+    {
+      q:'Rank employees by salary within each department (highest = rank 1).',
+      sql:`SELECT\n  RANK() OVER (PARTITION BY dept ORDER BY salary DESC) AS dept_rank,\n  name, dept, salary\nFROM employees\nORDER BY dept, dept_rank;`,
+      fn: ()=>{ const byDept={}; employees.forEach(e=>{if(!byDept[e.dept])byDept[e.dept]=[]; byDept[e.dept].push(e);}); const result=[]; Object.values(byDept).forEach(arr=>{ const s=arr.sort((a,b)=>b.salary-a.salary); let r=1; s.forEach(e=>result.push({dept_rank:r++,name:e.name,dept:e.dept,salary:e.salary})); }); return result.sort((a,b)=>a.dept.localeCompare(b.dept)||a.dept_rank-b.dept_rank); }
+    },
+    {
+      q:"For each employee show their salary and the next person's salary (ordered by id).",
+      sql:`SELECT name, salary,\n  LEAD(salary, 1) OVER (ORDER BY id) AS next_salary\nFROM employees\nORDER BY id;`,
+      fn: ()=>{ const s=[...employees].sort((a,b)=>a.id-b.id); return s.map((e,i)=>({name:e.name,salary:e.salary,next_salary:i<s.length-1?s[i+1].salary:null})); }
+    },
+    {
+      q:'Show a running total of salaries ordered by id.',
+      sql:`SELECT name, salary,\n  SUM(salary) OVER (\n    ORDER BY id\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  ) AS running_total\nFROM employees\nORDER BY id;`,
+      fn: ()=>{ const s=[...employees].sort((a,b)=>a.id-b.id); let run=0; return s.map(e=>({name:e.name,salary:e.salary,running_total:(run+=e.salary)})); }
+    },
+    {
+      q:"Show each employee's salary vs their department's average salary.",
+      sql:`SELECT name, dept, salary,\n  ROUND(AVG(salary) OVER (PARTITION BY dept)) AS dept_avg\nFROM employees\nORDER BY dept, salary DESC;`,
+      fn: ()=>{ const avg={}; employees.forEach(e=>{if(!avg[e.dept]){const g=employees.filter(x=>x.dept===e.dept); avg[e.dept]=Math.round(g.reduce((s,x)=>s+x.salary,0)/g.length);}}); return [...employees].sort((a,b)=>a.dept.localeCompare(b.dept)||b.salary-a.salary).map(e=>({name:e.name,dept:e.dept,salary:e.salary,dept_avg:avg[e.dept]})); }
+    },
+    {
+      q:'Find the top earner per department using ROW_NUMBER (keep only rank = 1).',
+      sql:`SELECT name, dept, salary\nFROM (\n  SELECT name, dept, salary,\n    ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) AS rn\n  FROM employees\n) sub\nWHERE rn = 1\nORDER BY salary DESC;`,
+      fn: ()=>{ const byDept={}; employees.forEach(e=>{ if(!byDept[e.dept]||e.salary>byDept[e.dept].salary) byDept[e.dept]=e; }); return Object.values(byDept).sort((a,b)=>b.salary-a.salary).map(e=>({name:e.name,dept:e.dept,salary:e.salary})); }
+    },
+    {
+      q:'Show the salary difference between each employee and the previous one (ordered by id).',
+      sql:`SELECT name, salary,\n  LAG(salary, 1) OVER (ORDER BY id) AS prev_salary,\n  salary - LAG(salary, 1) OVER (ORDER BY id) AS diff\nFROM employees\nORDER BY id;`,
+      fn: ()=>{ const s=[...employees].sort((a,b)=>a.id-b.id); return s.map((e,i)=>({ name:e.name, salary:e.salary, prev_salary:i>0?s[i-1].salary:null, diff:i>0?e.salary-s[i-1].salary:null })); }
+    },
+  ],
+  dml:[
+    {
+      q:'Write a DELETE that removes all employees from the Marketing department. Show the rows that would be deleted.',
+      sql:`-- Preview rows to be deleted:\nSELECT id, name, dept, salary\nFROM employees\nWHERE dept = 'Marketing';\n\n-- Actual DELETE:\nDELETE FROM employees\nWHERE dept = 'Marketing';`,
+      fn: ()=> employees.filter(e=>e.dept==='Marketing').map(e=>({id:e.id,name:e.name,dept:e.dept,salary:e.salary}))
+    },
+    {
+      q:"Write an UPDATE that gives all Engineering employees a 15% salary raise.",
+      sql:`-- Preview: what salaries would look like after update:\nSELECT name, salary AS old_salary,\n  ROUND(salary * 1.15) AS new_salary\nFROM employees\nWHERE dept = 'Engineering';\n\n-- Actual UPDATE:\nUPDATE employees\nSET salary = ROUND(salary * 1.15)\nWHERE dept = 'Engineering';`,
+      fn: ()=> employees.filter(e=>e.dept==='Engineering').map(e=>({name:e.name,old_salary:e.salary,new_salary:Math.round(e.salary*1.15)}))
+    },
+    {
+      q:'Write a DELETE that removes all employees earning below 7000.',
+      sql:`-- Preview rows to be deleted:\nSELECT id, name, salary, dept\nFROM employees\nWHERE salary < 7000;\n\n-- Actual DELETE:\nDELETE FROM employees\nWHERE salary < 7000;`,
+      fn: ()=> employees.filter(e=>e.salary<7000).map(e=>({id:e.id,name:e.name,salary:e.salary,dept:e.dept}))
+    },
+    {
+      q:"Write an UPDATE that renames the 'HR' department to 'Human Resources' for all employees.",
+      sql:`-- Preview affected rows:\nSELECT name, dept AS old_dept,\n  'Human Resources' AS new_dept\nFROM employees\nWHERE dept = 'HR';\n\n-- Actual UPDATE:\nUPDATE employees\nSET dept = 'Human Resources'\nWHERE dept = 'HR';`,
+      fn: ()=> employees.filter(e=>e.dept==='HR').map(e=>({name:e.name,old_dept:e.dept,new_dept:'Human Resources'}))
+    },
+    {
+      q:"Write a DELETE that removes employees who joined after 2022 AND work in Marketing.",
+      sql:`-- Preview rows to be deleted:\nSELECT id, name, dept, date_of_joining\nFROM employees\nWHERE dept = 'Marketing'\n  AND EXTRACT(YEAR FROM date_of_joining) > 2022;\n\n-- Actual DELETE:\nDELETE FROM employees\nWHERE dept = 'Marketing'\n  AND EXTRACT(YEAR FROM date_of_joining) > 2022;`,
+      fn: ()=> employees.filter(e=>e.dept==='Marketing'&&new Date(e.date_of_joining).getFullYear()>2022).map(e=>({id:e.id,name:e.name,dept:e.dept,date_of_joining:e.date_of_joining}))
+    },
+  ]
+};
+
+function switchPracticeTab(level, btn) {
+  document.querySelectorAll('.practice-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.practice-level').forEach(l=>l.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('practice-'+level).classList.add('active');
+}
+
+function toggleAnswer(id) {
+  const answer = document.getElementById('ans-'+id);
+  const arrow  = document.getElementById('arr-'+id);
+  const isOpen = answer.classList.contains('visible');
+  answer.classList.toggle('visible', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+  if (!isOpen && !answer.dataset.loaded) {
+    answer.dataset.loaded = '1';
+    const [lvl, idx] = id.split('-');
+    const q = practiceQuestions[lvl][parseInt(idx)];
+    const rows = q.fn();
+    document.getElementById('pans-sql-'+id).innerHTML = hl(q.sql);
+    document.getElementById('pans-tbl-'+id).innerHTML = renderTable(rows);
+    document.getElementById('pans-cnt-'+id).textContent = (rows?rows.length:0)+' rows';
+  }
+}
+
+function buildPractice() {
+  const numColors = {beg:'', int:'yellow', adv:'red', dml:'red'};
+  Object.entries(practiceQuestions).forEach(([lvl, questions])=>{
+    const container = document.getElementById('practice-'+lvl);
+    const nc = numColors[lvl];
+    let html = '';
+    questions.forEach((q, i)=>{
+      const id = `${lvl}-${i}`;
+      html += `
+      <div class="pcard">
+        <div class="pcard-q" onclick="toggleAnswer('${id}')">
+          <span class="pcard-num ${nc}">Q${i+1}</span>
+          <span class="pcard-qtext">${q.q}</span>
+          <span class="reveal-arrow" id="arr-${id}">▶</span>
+        </div>
+        <div class="pcard-answer" id="ans-${id}">
+          <div class="answer-label">Answer</div>
+          <div class="query-block" id="pans-sql-${id}"></div>
+          <div class="output-label">Output <span id="pans-cnt-${id}">—</span></div>
+          <div id="pans-tbl-${id}"></div>
+        </div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  });
+}
+
+buildPractice();
+renderSection('content-beginner', beginnerCards);
+renderSection('content-intermediate', intermediateCards);
+renderSection('content-advanced', advancedCards);
+
+/* ══════════════════════════════════════════
+   TABLES PAGE
+══════════════════════════════════════════ */
+const tablesDef = [
+  {
+    name: 'employees',
+    badge: 'Main Table',
+    desc: 'Main table used across all queries — employee records with salary, department, age and join date.',
+    columns: [
+      {name:'id',              type:'INTEGER',     pk:true},
+      {name:'name',            type:'VARCHAR'},
+      {name:'salary',          type:'INTEGER'},
+      {name:'dept',            type:'VARCHAR',     fk:true},
+      {name:'age',             type:'INTEGER'},
+      {name:'date_of_joining', type:'DATE'},
+    ],
+    data: employees,
+    queries: [
+      {label:'All rows',    sql:'SELECT * FROM employees;',                                            fn: ()=> employees.map(e=>({...e}))},
+      {label:'By salary',   sql:'SELECT * FROM employees ORDER BY salary DESC;',                       fn: ()=> [...employees].sort((a,b)=>b.salary-a.salary)},
+      {label:'Eng only',    sql:"SELECT * FROM employees WHERE dept = 'Engineering';",                 fn: ()=> employees.filter(e=>e.dept==='Engineering')},
+      {label:'Top 5 salary',sql:'SELECT name, salary, dept FROM employees ORDER BY salary DESC LIMIT 5;', fn: ()=> [...employees].sort((a,b)=>b.salary-a.salary).slice(0,5).map(e=>({name:e.name,salary:e.salary,dept:e.dept}))},
+      {label:'Dept count',  sql:'SELECT dept, COUNT(*) AS count FROM employees GROUP BY dept ORDER BY count DESC;',
+        fn: ()=>{ const g={}; employees.forEach(e=>{g[e.dept]=(g[e.dept]||0)+1;}); return Object.entries(g).sort((a,b)=>b[1]-a[1]).map(([dept,count])=>({dept,count})); }
+      },
+      {label:'Avg salary',  sql:'SELECT dept, ROUND(AVG(salary)) AS avg_salary FROM employees GROUP BY dept ORDER BY avg_salary DESC;',
+        fn: ()=>{ const g={}; employees.forEach(e=>{if(!g[e.dept])g[e.dept]={s:0,c:0}; g[e.dept].s+=e.salary; g[e.dept].c++;}); return Object.entries(g).map(([dept,v])=>({dept,avg_salary:Math.round(v.s/v.c)})).sort((a,b)=>b.avg_salary-a.avg_salary); }
+      },
+    ]
+  },
+  {
+    name: 'departments',
+    badge: 'Lookup Table',
+    desc: 'Lookup table for departments — joins to employees via dept name.',
+    columns: [
+      {name:'dept_id',   type:'INTEGER', pk:true},
+      {name:'dept_name', type:'VARCHAR'},
+      {name:'location',  type:'VARCHAR'},
+      {name:'budget',    type:'INTEGER'},
+    ],
+    data: departments,
+    queries: [
+      {label:'All rows',      sql:'SELECT * FROM departments;',                                           fn: ()=> departments.map(d=>({...d}))},
+      {label:'By budget',     sql:'SELECT * FROM departments ORDER BY budget DESC;',                      fn: ()=> [...departments].sort((a,b)=>b.budget-a.budget)},
+      {label:'Cairo only',    sql:"SELECT * FROM departments WHERE location = 'Cairo';",                  fn: ()=> departments.filter(d=>d.location==='Cairo')},
+      {label:'With emp count',sql:'SELECT d.dept_name, d.location, COUNT(e.id) AS emp_count\nFROM departments d LEFT JOIN employees e ON e.dept = d.dept_name\nGROUP BY d.dept_name, d.location ORDER BY emp_count DESC;',
+        fn: ()=> departments.map(d=>({dept_name:d.dept_name, location:d.location, emp_count:employees.filter(e=>e.dept===d.dept_name).length})).sort((a,b)=>b.emp_count-a.emp_count)
+      },
+    ]
+  },
+  {
+    name: 'messages',
+    badge: 'Regex Table',
+    desc: 'Text data table used for regex pattern matching queries — real-world style messages with categories.',
+    columns: [
+      {name:'id',       type:'INTEGER', pk:true},
+      {name:'sender',   type:'VARCHAR'},
+      {name:'content',  type:'VARCHAR'},
+      {name:'category', type:'VARCHAR'},
+    ],
+    data: messages,
+    queries: [
+      {label:'All rows',     sql:'SELECT * FROM messages;',                                                    fn: ()=> messages.map(m=>({...m}))},
+      {label:'Has number',   sql:"SELECT sender, content FROM messages WHERE content ~ '\\d+';",               fn: ()=> messages.filter(m=>/\d+/.test(m.content)).map(m=>({sender:m.sender,content:m.content}))},
+      {label:'System alerts',sql:"SELECT sender, content FROM messages WHERE content ~* 'error|warning';",     fn: ()=> messages.filter(m=>/error|warning/i.test(m.content)).map(m=>({sender:m.sender,content:m.content}))},
+      {label:'Has email',    sql:"SELECT sender, content FROM messages WHERE content ~ '@';",                  fn: ()=> messages.filter(m=>/@/.test(m.content)).map(m=>({sender:m.sender,content:m.content}))},
+      {label:'By category',  sql:'SELECT category, COUNT(*) AS count FROM messages GROUP BY category ORDER BY count DESC;', fn: ()=>{ const g={}; messages.forEach(m=>{g[m.category]=(g[m.category]||0)+1;}); return Object.entries(g).sort((a,b)=>b[1]-a[1]).map(([category,count])=>({category,count})); }},
+    ]
+  },
+];
+
+let tblQueryCounters = {};
+
+function runTblQuery(tblIdx, qIdx) {
+  const key = `${tblIdx}-${qIdx}`;
+  const outEl  = document.getElementById(`tbl-out-${key}`);
+  const tblEl  = document.getElementById(`tbl-tbl-${key}`);
+  const cntEl  = document.getElementById(`tbl-cnt-${key}`);
+  const rows = tablesDef[tblIdx].queries[qIdx].fn();
+  tblEl.innerHTML = renderTable(rows);
+  cntEl.textContent = (rows ? rows.length : 0) + ' rows';
+  outEl.classList.add('visible');
+}
+
+function buildTablesPage() {
+  const container = document.getElementById('content-tables');
+  let html = '';
+
+  tablesDef.forEach((tbl, ti) => {
+    const rowCount = tbl.data.length;
+    const colCount = tbl.columns.length;
+
+    // schema chips
+    let schemaHtml = '';
+    tbl.columns.forEach(c => {
+      const cls = c.pk ? 'pk' : c.fk ? 'fk' : '';
+      schemaHtml += `<div class="col-chip ${cls}"><span class="col-chip-name">${c.name}</span><span class="col-chip-type">${c.type}</span></div>`;
+    });
+
+    // query rows
+    let queryRowsHtml = '';
+    tbl.queries.forEach((q, qi) => {
+      const key = `${ti}-${qi}`;
+      queryRowsHtml += `
+        <div>
+          <div class="tbl-query-row">
+            <span class="tbl-query-label">${q.label}</span>
+            <div class="tbl-query-code">${q.sql.replace(/\n/g,' ')}</div>
+            <button class="tbl-run-btn" onclick="runTblQuery(${ti},${qi})">▶ Run</button>
+          </div>
+          <div class="tbl-output" id="tbl-out-${key}">
+            <div class="output-label">Output <span id="tbl-cnt-${key}">0 rows</span></div>
+            <div id="tbl-tbl-${key}"></div>
+          </div>
+        </div>`;
+    });
+
+    html += `
+    <div class="tbl-card">
+      <div class="tbl-card-header">
+        <div class="tbl-card-title">
+          <div class="tbl-name">
+            <span style="color:var(--muted);font-weight:400">table</span> ${tbl.name}
+            <span class="tbl-name-badge">${tbl.badge}</span>
+          </div>
+          <div class="tbl-desc">${tbl.desc}</div>
+        </div>
+        <div class="tbl-meta">
+          <div class="tbl-stat"><span>${rowCount}</span> rows</div>
+          <div class="tbl-stat"><span>${colCount}</span> columns</div>
+        </div>
+      </div>
+      <div class="tbl-body">
+        <div class="col-schema">${schemaHtml}</div>
+
+        <div class="output-label" style="margin-bottom:0.8rem">Full Data <span style="background:rgba(137,221,255,0.12);color:var(--op)">${rowCount} rows</span></div>
+        <div class="table-wrap" style="margin-bottom:1.5rem">${renderTable(tbl.data)}</div>
+
+        <div class="output-label" style="margin-bottom:1rem">
+          Quick Queries <span style="background:rgba(199,146,234,0.12);color:var(--kw)">${tbl.queries.length} queries</span>
+        </div>
+        <div class="tbl-queries">${queryRowsHtml}</div>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+buildTablesPage();
+</script>
+</body>
+</html>
