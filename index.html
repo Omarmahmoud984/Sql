@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>SQL Learn</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -52,11 +52,14 @@ body.light-mode .pcard{background:var(--card);}
 body.light-mode .tbl-card{background:var(--card);}
 body.light-mode .qcard{background:var(--card);}
 body.light-mode thead tr{background:var(--qbg);}
-
-*{transition:background-color 0.2s,color 0.15s,border-color 0.15s;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;}
+.qcard,.qcard-body,.qcard-header,.dml-card,.dml-card-body,
+.kpill,.run-btn,.expand-all-btn,.theme-toggle,.copy-btn,
+.tbl-run-btn,.pcard,.nav-links button{
+  transition:background-color 0.2s,color 0.15s,border-color 0.15s,transform 0.15s,opacity 0.15s;
+}
 
 /* ── NAV ── */
 nav{
@@ -546,13 +549,215 @@ tbody tr:hover{background:rgba(255,255,255,0.025);}
   border-radius:7px;padding:0.8rem 1rem;font-size:0.82rem;color:var(--fn);
 }
 
+/* ── SEARCH BAR ── */
+.search-bar{
+  max-width:1140px;margin:0 auto;
+  padding:0 2rem 1rem;
+}
+.search-wrap{position:relative;}
+.search-icon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:0.9rem;pointer-events:none;
+}
+.search-input{
+  width:100%;background:var(--card);border:1px solid var(--border);
+  border-radius:9px;padding:9px 38px 9px 36px;
+  font-family:'Syne',sans-serif;font-size:0.88rem;
+  color:var(--text);outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.search-input::placeholder{color:var(--muted);}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,255,176,0.1);}
+.search-clear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:1rem;padding:2px 6px;
+  display:none;
+}
+.search-clear:hover{color:var(--text);}
+.search-clear.visible{display:block;}
+.search-count{
+  font-size:0.72rem;color:var(--muted);
+  font-family:'JetBrains Mono',monospace;
+  margin-top:6px;min-height:16px;
+}
+.qcard.search-hidden{display:none;}
+.section-label.search-hidden{display:none;}
+
+/* ── SCROLL TO TOP ── */
+.scroll-top{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  width:42px;height:42px;border-radius:50%;
+  background:var(--accent);color:#0d0f14;
+  border:none;cursor:pointer;
+  font-size:1.1rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(79,255,176,0.3);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.25s,transform 0.2s;
+  z-index:300;
+}
+.scroll-top.visible{opacity:1;pointer-events:all;}
+.scroll-top:hover{transform:translateY(-3px);}
+
 /* ── RESPONSIVE ── */
+
+/* ── Tablet (≤900px) ── */
+@media(max-width:900px){
+  .hero h1{font-size:2rem;}
+  .content{padding:0.5rem 1.2rem 4rem;}
+  .hero{padding:2rem 1.2rem 1.5rem;}
+  .dml-content{padding:0.5rem 1.2rem 4rem;}
+  .expand-bar{padding:0 1.2rem 1rem;}
+  .tables-grid{padding:0.5rem 1.2rem 4rem;}
+  .practice-content{padding:1.2rem 1.2rem 4rem;}
+}
+
+/* ── Mobile (≤640px) ── */
 @media(max-width:640px){
-  .hero h1{font-size:1.9rem;}
-  .nav-brand{font-size:0.85rem;margin-right:1rem;}
-  .nav-links button{padding:0 0.7rem;font-size:0.75rem;}
-  .content{padding:0.5rem 1rem 4rem;}
-  .hero{padding:2rem 1rem 1.5rem;}
+
+  /* NAV — scrollable horizontal */
+  nav{
+    padding:0 0.8rem;
+    overflow-x:auto;
+    gap:0;
+    height:auto;
+    min-height:52px;
+    flex-wrap:nowrap;
+  }
+  nav::-webkit-scrollbar{display:none;}
+  .nav-brand{
+    font-size:0.82rem;margin-right:1rem;
+    flex-shrink:0;padding:14px 0;
+  }
+  .nav-links{flex-shrink:0;}
+  .nav-links button{
+    padding:0 0.65rem;font-size:0.72rem;
+    height:52px;letter-spacing:0.3px;
+    white-space:nowrap;
+  }
+  .theme-toggle{
+    flex-shrink:0;font-size:0.72rem;
+    padding:5px 8px;margin-left:0.5rem;
+  }
+
+  /* HERO */
+  .hero{padding:1.5rem 1rem 1rem;}
+  .hero h1{font-size:1.6rem;letter-spacing:-1px;}
+  .hero p{font-size:0.88rem;}
+  .level-badge{font-size:0.65rem;padding:3px 10px;}
+
+  /* CONTENT */
+  .content{padding:0.5rem 0.8rem 4rem;gap:1.2rem;}
+  .section-label{font-size:0.65rem;margin-top:0.5rem;}
+
+  /* QUERY CARD */
+  .qcard-header{padding:0.9rem 1rem;}
+  .qcard-title{font-size:0.85rem;gap:7px;}
+  .qtag{font-size:0.62rem;padding:2px 6px;}
+  .qcard-body{padding:0 1rem;}
+  .qcard.expanded .qcard-body{padding:1rem 1rem;}
+
+  /* QUERY BLOCK */
+  .query-block{
+    font-size:0.75rem;padding:0.85rem 0.9rem;
+    word-break:break-word;
+  }
+  .query-block::before{display:none;}
+  .copy-btn{opacity:1;pointer-events:all;font-size:0.6rem;padding:2px 6px;top:6px;right:6px;}
+
+  /* RUN BUTTON */
+  .run-btn{font-size:0.72rem;padding:6px 12px;}
+  .run-btn svg{width:11px;height:11px;}
+
+  /* EXPLANATION */
+  .explanation{padding:0.75rem 0.9rem;}
+  .exp-ar{font-size:0.83rem;}
+  .exp-en{font-size:0.75rem;}
+
+  /* PILLS */
+  .kpills{gap:6px;}
+  .kpill{padding:4px 8px;font-size:0.72rem;}
+  .kpill-key{font-size:0.75rem;padding:2px 5px;}
+  .kpill-desc{font-size:0.7rem;}
+
+  /* NOTE BOX */
+  .note-box{padding:0.8rem 0.9rem;}
+  .note-box .note-ar{font-size:0.82rem;}
+  .note-box .note-en{font-size:0.73rem;}
+
+  /* OUTPUT TABLE */
+  .table-wrap{border-radius:6px;}
+  table{font-size:0.75rem;}
+  th{padding:7px 9px;font-size:0.65rem;}
+  td{padding:6px 9px;font-size:0.72rem;}
+  .output-label{font-size:0.65rem;}
+
+  /* EXPAND BAR */
+  .expand-bar{padding:0 0.8rem 0.8rem;gap:8px;}
+  .expand-all-btn{font-size:0.7rem;padding:5px 10px;}
+
+  /* REGEX TABLE */
+  .regex-table{font-size:0.72rem;}
+  .regex-table th{padding:6px 8px;font-size:0.62rem;}
+  .regex-table td{padding:5px 8px;}
+  .regex-pat{font-size:0.72rem;padding:1px 5px;}
+  .regex-example{font-size:0.65rem;}
+
+  /* REGEX [] vs () BOXES */
+  .regex-wrap + div[style*="grid"]{
+    grid-template-columns:1fr !important;
+  }
+
+  /* PRACTICE PAGE */
+  .practice-tabs{padding:0 0.8rem;overflow-x:auto;}
+  .practice-tabs::-webkit-scrollbar{display:none;}
+  .practice-tab{font-size:0.72rem;padding:0 0.8rem;white-space:nowrap;}
+  .practice-content{padding:1rem 0.8rem 4rem;}
+  .pcard-header{padding:0.9rem 1rem;}
+  .pcard-qtext{font-size:0.85rem;}
+  .pcard-num{font-size:0.65rem;padding:2px 7px;}
+  .pcard-answer{padding:0 1rem 1rem;}
+
+  /* TABLES PAGE */
+  .tables-grid{padding:0.5rem 0.8rem 4rem;gap:1.5rem;}
+  .tbl-card-header{padding:1rem 1rem;flex-direction:column;align-items:flex-start;}
+  .tbl-meta{margin-top:4px;}
+  .tbl-body{padding:1rem;}
+  .col-schema{gap:6px;}
+  .col-chip{font-size:0.68rem;padding:4px 7px;}
+  .tbl-query-row{flex-wrap:wrap;gap:6px;}
+  .tbl-query-code{font-size:0.7rem;min-width:0;}
+  .tbl-run-btn{font-size:0.7rem;padding:5px 10px;}
+
+  /* DML PAGE */
+  .dml-content{padding:0.5rem 0.8rem 4rem;gap:1.5rem;}
+  .dml-section-title{font-size:0.95rem;}
+  .dml-badge{font-size:0.65rem;padding:3px 7px;}
+  .dml-card-header{padding:0.85rem 1rem;}
+  .dml-card-title{font-size:0.82rem;}
+  .dml-card-body{padding:0 1rem;}
+  .dml-card.expanded .dml-card-body{padding:1rem 1rem;}
+  .syntax-block{font-size:0.75rem;padding:0.8rem 0.9rem;}
+  .syntax-block::before{display:none;}
+  .dml-func-ar{font-size:0.82rem;}
+  .dml-func-en{font-size:0.73rem;}
+  .dml-affected{font-size:0.75rem;}
+
+  /* ABOUT PAGE */
+  #page-about > div{padding:3rem 1rem;}
+
+  /* SEARCH BAR */
+  .search-bar{padding:0 0.8rem 0.8rem;}
+  .search-input{font-size:0.82rem;padding:8px 12px 8px 36px;}
+}
+
+/* ── Very small (≤380px) ── */
+@media(max-width:380px){
+  .hero h1{font-size:1.35rem;}
+  .nav-links button{padding:0 0.5rem;font-size:0.68rem;}
+  .query-block{font-size:0.7rem;}
+  td,th{padding:5px 7px;font-size:0.68rem;}
 }
 </style>
 </head>
@@ -572,6 +777,8 @@ tbody tr:hover{background:rgba(255,255,255,0.025);}
   <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
 </nav>
 
+<button class="scroll-top" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
 <!-- ═══════════════════════════════════════════════════
      BEGINNER PAGE
 ════════════════════════════════════════════════════ -->
@@ -584,6 +791,14 @@ tbody tr:hover{background:rgba(255,255,255,0.025);}
   <div class="expand-bar">
     <button class="expand-all-btn" onclick="expandAll('content-beginner')">▼ Expand All</button>
     <button class="expand-all-btn" onclick="collapseAll('content-beginner')">▲ Collapse All</button>
+  </div>
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="Search queries, keywords, explanations..." oninput="searchCards('content-beginner',this)" id="search-beginner">
+      <button class="search-clear" onclick="clearSearch('content-beginner','search-beginner')">×</button>
+    </div>
+    <div class="search-count" id="count-beginner"></div>
   </div>
   <div class="content" id="content-beginner"></div>
 </div>
@@ -601,6 +816,14 @@ tbody tr:hover{background:rgba(255,255,255,0.025);}
     <button class="expand-all-btn" onclick="expandAll('content-intermediate')">▼ Expand All</button>
     <button class="expand-all-btn" onclick="collapseAll('content-intermediate')">▲ Collapse All</button>
   </div>
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="Search queries, keywords, explanations..." oninput="searchCards('content-intermediate',this)" id="search-intermediate">
+      <button class="search-clear" onclick="clearSearch('content-intermediate','search-intermediate')">×</button>
+    </div>
+    <div class="search-count" id="count-intermediate"></div>
+  </div>
   <div class="content" id="content-intermediate"></div>
 </div>
 
@@ -616,6 +839,14 @@ tbody tr:hover{background:rgba(255,255,255,0.025);}
   <div class="expand-bar">
     <button class="expand-all-btn" onclick="expandAll('content-advanced')">▼ Expand All</button>
     <button class="expand-all-btn" onclick="collapseAll('content-advanced')">▲ Collapse All</button>
+  </div>
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="Search queries, keywords, explanations..." oninput="searchCards('content-advanced',this)" id="search-advanced">
+      <button class="search-clear" onclick="clearSearch('content-advanced','search-advanced')">×</button>
+    </div>
+    <div class="search-count" id="count-advanced"></div>
   </div>
   <div class="content" id="content-advanced"></div>
 </div>
@@ -765,6 +996,61 @@ function expandAll(containerId) {
 function collapseAll(containerId) {
   document.getElementById(containerId).querySelectorAll('.qcard').forEach(c => c.classList.remove('expanded'));
 }
+
+function searchCards(containerId, input) {
+  const query = input.value.trim().toLowerCase();
+  const container = document.getElementById(containerId);
+  const cards = container.querySelectorAll('.qcard');
+  const labels = container.querySelectorAll('.section-label');
+  const clearBtn = input.nextElementSibling;
+  const countEl = document.getElementById('count-' + containerId.replace('content-',''));
+
+  clearBtn.classList.toggle('visible', query.length > 0);
+
+  if (!query) {
+    cards.forEach(c => { c.classList.remove('search-hidden'); });
+    labels.forEach(l => l.classList.remove('search-hidden'));
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+
+  let matches = 0;
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    const hidden = !text.includes(query);
+    card.classList.toggle('search-hidden', hidden);
+    if (!hidden) {
+      matches++;
+      card.classList.add('expanded');
+    }
+  });
+
+  // hide section labels with no visible cards
+  labels.forEach(label => {
+    let next = label.nextElementSibling;
+    let hasVisible = false;
+    while (next && !next.classList.contains('section-label')) {
+      if (next.classList.contains('qcard') && !next.classList.contains('search-hidden')) hasVisible = true;
+      next = next.nextElementSibling;
+    }
+    label.classList.toggle('search-hidden', !hasVisible);
+  });
+
+  if (countEl) countEl.textContent = matches === 0 ? 'No matches' : `${matches} card${matches>1?'s':''} found`;
+}
+
+function clearSearch(containerId, inputId) {
+  const input = document.getElementById(inputId);
+  input.value = '';
+  searchCards(containerId, input);
+  input.focus();
+}
+
+// Scroll to top button
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('scroll-top-btn');
+  if (btn) btn.classList.toggle('visible', window.scrollY > 300);
+});
 
 function copySQL(btn) {
   const block = btn.parentElement;
@@ -964,8 +1250,8 @@ function runQuery(id) {
    SYNTAX HIGHLIGHT HELPER
 ══════════════════════════════════════════ */
 function hl(sql, glowWords) {
-  const keywords = ['SELECT','FROM','WHERE','AND','OR','NOT','IN','BETWEEN','LIKE','ORDER','BY','ASC','DESC','LIMIT','UNION','ALL','EXCEPT','INTERSECT','GROUP','HAVING','JOIN','INNER','LEFT','RIGHT','ON','AS','DISTINCT','CASE','WHEN','THEN','ELSE','END','NULL','IS','OVER','PARTITION','ROWS','RANGE','UNBOUNDED','PRECEDING','FOLLOWING','CURRENT','ROW','WITH','TIES','FILTER','NULLIF','COALESCE','CAST','TRIM','REPLACE','CONCAT','EXISTS'];
-  const functions = ['COUNT','SUM','AVG','MIN','MAX','UPPER','LOWER','LENGTH','SUBSTRING','NOW','CURRENT_DATE','EXTRACT','ROW_NUMBER','RANK','DENSE_RANK','LEAD','LAG','COALESCE','CAST','ROUND','CEIL','FLOOR','CONCAT_WS','DATE_TRUNC','FIRST_VALUE','LAST_VALUE','NTILE','PERCENT_RANK','CONCAT','TRIM','REPLACE','NULLIF'];
+  const keywords = ['SELECT','FROM','WHERE','AND','OR','NOT','IN','BETWEEN','LIKE','ORDER','BY','ASC','DESC','LIMIT','UNION','ALL','EXCEPT','INTERSECT','GROUP','HAVING','JOIN','INNER','LEFT','RIGHT','ON','AS','DISTINCT','CASE','WHEN','THEN','ELSE','END','NULL','IS','OVER','PARTITION','ROWS','RANGE','UNBOUNDED','PRECEDING','FOLLOWING','CURRENT','ROW','WITH','TIES','FILTER','NULLIF','COALESCE','CAST','TRIM','REPLACE','CONCAT','EXISTS','EXPLAIN','ANALYZE'];
+  const functions = ['COUNT','SUM','AVG','MIN','MAX','UPPER','LOWER','LENGTH','SUBSTRING','NOW','CURRENT_DATE','EXTRACT','ROW_NUMBER','RANK','DENSE_RANK','LEAD','LAG','COALESCE','CAST','ROUND','CEIL','FLOOR','CONCAT_WS','DATE_TRUNC','FIRST_VALUE','LAST_VALUE','NTILE','PERCENT_RANK','CUME_DIST','NTH_VALUE','CONCAT','TRIM','REPLACE','NULLIF'];
   let result = sql
     .replace(/--[^\n]*/g, m => `<span class="cm">${m}</span>`)
     .replace(/'[^']*'/g, m => `<span class="str">${m}</span>`)
@@ -2027,7 +2313,7 @@ ORDER BY dept;`),
     cards:[
       {id:'a15',title:'EXPLAIN — Query Plan',tag:'WINDOW',tagClass:'qtag-window',
        sql:hl(`EXPLAIN\nSELECT name, salary\nFROM employees\nWHERE dept = 'Engineering'\nORDER BY salary DESC;`),
-       glowKw:'WITH',
+       glowKw:'EXPLAIN',
        expAr:'EXPLAIN بتريك خطة التنفيذ اللي PostgreSQL هتستخدمها — من غير ما تنفذ الـ query فعلاً. مفيدة تعرف الـ database هتعمل إيه قبل ما تشغّل.',
        expEn:'EXPLAIN shows the execution plan PostgreSQL will use — without actually running the query. Use it to understand how your query will be executed.',
        note:{
@@ -2043,7 +2329,7 @@ ORDER BY dept;`),
        ]},
       {id:'a16',title:'EXPLAIN ANALYZE — Real Execution',tag:'WINDOW',tagClass:'qtag-window',
        sql:hl(`EXPLAIN ANALYZE\nSELECT dept, AVG(salary)\nFROM employees\nGROUP BY dept\nORDER BY AVG(salary) DESC;`),
-       glowKw:'WITH',
+       glowKw:'EXPLAIN',
        expAr:'EXPLAIN ANALYZE بتنفذ الـ query فعلاً وبترجع الوقت الحقيقي — مش تقدير. بتقارن بين الـ estimated والـ actual عشان تعرف فين المشكلة.',
        expEn:'EXPLAIN ANALYZE actually runs the query and returns real timing — not estimates. Compare estimated vs actual rows to spot performance issues.',
        note:{
@@ -2115,7 +2401,7 @@ ORDER BY salary;`),
   ROUND(PERCENT_RANK() OVER (ORDER BY salary)::NUMERIC, 3)    AS pct_rank_compare
 FROM employees
 ORDER BY salary;`),
-       glowKw:'WITH',
+       glowKw:'CUME_DIST',
        expAr:`CUME_DIST بترجع نسبة الصفوف اللي قيمتها أقل من أو تساوي الصف الحالي — يعني لو ناتجها 0.7 معناه 70% من الموظفين راتبهم أقل منك أو زيك.
 
 الفرق الجوهري بينها وبين PERCENT_RANK:
@@ -2148,7 +2434,7 @@ ORDER BY salary;`),
   ) AS top_earner_name
 FROM employees
 ORDER BY dept, salary DESC;`),
-       glowKw:'WITH',
+       glowKw:'NTH_VALUE',
        expAr:`NTH_VALUE بتجيب الـ n-th قيمة في الـ window — زي FIRST_VALUE بس بتقدر تحدد أي رقم تريبه.
 
 تنبيه مهم: لازم تكتب ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING — من غيرها الـ frame الافتراضي بيوقف عند الصف الحالي فالصفوف اللي بعد ما يلاقوش الـ nth value وبترجع NULL.
@@ -2410,12 +2696,33 @@ const dmlSections = [
        sql:`TRUNCATE TABLE employees RESTART IDENTITY;`,
        preview: ()=> employees.map(e=>({id:e.id,name:e.name})),
        affected: ()=> employees.length,
-       note2:'RESTART IDENTITY resets the id sequence back to 1 — next inserted row gets id=1 again.'},
-      {id:'t3', title:'TRUNCATE CASCADE — also truncate related tables',
+       note2:`🔁 RESTART IDENTITY — إيه معناها بالظبط؟
+
+لما بتعمل TRUNCATE عادي، الجدول بيتمسح بس الـ sequence (العداد اللي بيديلك id تلقائي) بيفضل من حيث وقف.
+مثلاً لو كان عندك 10 صفوف وعملت TRUNCATE — الجدول فاضي بس لو ضفت صف جديد الـ id هيبدأ من 11 مش 1.
+
+RESTART IDENTITY بتقوله: "ارجع العداد من أول وجديد من 1".
+يعني أول insert بعدها هياخد id = 1، وهكذا.
+
+متى تستخدمها: لما بتعمل testing أو بتحمّل seed data وعايز الـ ids تبدأ من 1 دايماً في كل run.
+
+RESTART IDENTITY resets the auto-increment sequence to 1 — without it the counter continues from where it left off even after truncating.`},
+      {id:'t3', title:'TRUNCATE CASCADE — مسح الجداول المرتبطة',
        sql:`TRUNCATE TABLE departments CASCADE;`,
        preview: ()=> departments.map(d=>({dept_id:d.dept_id,dept_name:d.dept_name})),
        affected: ()=> departments.length,
-       note2:'CASCADE truncates all tables that have foreign keys referencing this table — use with caution.'},
+       note2:`⛓️ CASCADE — إيه معناها بالظبط؟
+
+لو عندك جدولين — departments وemployees — وجدول employees فيه foreign key بيشاور على departments.
+لو حاولت تعمل TRUNCATE على departments من غير CASCADE، هيديك error.
+السبب: في employees بيانات بتشاور على departments — الـ database مش بتسمحلك تمسح جدول في بيانات تانية بتعتمد عليه.
+
+لما بتحط CASCADE، بتقوله: "امسح departments وامسح أي جدول تاني بيعتمد عليه تلقائياً".
+يعني هيمسح departments وبعدين هيمسح employees كمان في نفس الأمر.
+
+⚠️ خطير جداً — CASCADE ممكن تمسح جداول كتير في خطوة واحدة من غير ما تلاحظ. استخدمها بحذر جداً وتأكد من إيه الجداول اللي بتعتمد على الجدول ده.
+
+CASCADE automatically truncates all tables with foreign keys pointing to this table — can wipe multiple tables in one command. Always verify dependencies before using.`},
     ]
   },
   {
